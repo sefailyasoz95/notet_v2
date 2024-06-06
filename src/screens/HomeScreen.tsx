@@ -99,7 +99,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 						/>
 						<Text className='text-white font-semibold'>
 							{t("hello")},
-							{currentUser?.fullName
+							{currentUser && currentUser?.fullName
 								? ` ${currentUser?.fullName.split(" ")[0]}`
 								: ` Guest${currentUser?.deviceId.slice(0, 5)}`}
 						</Text>

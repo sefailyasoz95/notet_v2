@@ -10,7 +10,7 @@ import Carousel from "react-native-reanimated-carousel";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
 import Animated, { Easing, FadeInUp, SlideInDown, SlideInUp } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createUser } from "../redux/actions";
+import { createUser, getCurrentUser } from "../redux/actions";
 import * as Localize from "expo-localization";
 import { setonboardingPassed } from "../redux/reducers";
 type Props = NativeStackScreenProps<AuthStackParams, "OnboardingScreen">;

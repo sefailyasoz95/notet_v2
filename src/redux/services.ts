@@ -47,10 +47,12 @@ export const uploadImageToSupabase = async (
 export const CreateUserService = async (body: UserType) => {
 	try {
 		let { data, error } = await supabase.from("users").insert(body);
-
+		let currentUser = await supabase.from("users").select("*").filter("deviceId", "eq", body.deviceId).single();
 		if (!error) {
 			return {
-				data,
+				data: {
+					currentUser: currentUser.data,
+				},
 				status: HttpStatusCode.Ok,
 				message: "",
 			};

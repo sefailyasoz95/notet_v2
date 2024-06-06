@@ -37,7 +37,7 @@ export const reducer = createSlice({
 			})
 			.addCase(createUser.fulfilled, (state, action) => {
 				if (action.payload.status === HttpStatusCode.Ok) {
-					// state.currentUser = action.payload.data
+					state.currentUser = action.payload.data?.currentUser;
 				}
 				state.loading = false;
 				// *********** createUser END *********** \\
