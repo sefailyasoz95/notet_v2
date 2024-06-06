@@ -22,6 +22,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-localization",
+      "expo-font"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "2ab775fd-55c1-4cf8-ac31-9b1e054c2cb8"
+      }
+    },
+    "owner": "sefailyasoz"
   }
 }
