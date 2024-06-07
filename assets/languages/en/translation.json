@@ -52,5 +52,9 @@
 	"noteDeleted": "Note deleted successfully",
 	"allowNotifications": "To be able to set a reminder, you must allow notifications from settings",
 	"save": "Save",
-	"reminderSet": "Your reminder has been set successfully"
+	"reminderSet": "Your reminder has been set successfully",
+	"changeLanguage": "Change Language",
+	"changeAppLangugage": "Change App Language",
+	"tr": "Turkish",
+	"en": "English"
 }

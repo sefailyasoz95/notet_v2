@@ -52,5 +52,9 @@
 	"noteDeleted": "Not başarıyla silindi",
 	"allowNotifications": "Bir hatırlatma ayarlayabilmek için, ayarlardan bildirimlere izin vermelisiniz",
 	"save": "Kaydet",
-	"reminderSet": "Hatırlatıcınız başarıyla ayarlandı"
+	"reminderSet": "Hatırlatıcınız başarıyla ayarlandı",
+	"changeLanguage": "Dili Değiştir",
+	"changeAppLangugage": "Uygulama dilini değiştir",
+	"tr": "Türkçe",
+	"en": "İngilizce"
 }

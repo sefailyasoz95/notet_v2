@@ -22,6 +22,8 @@ import { AboutUs, PrivacyPolicy, TermsOfService } from "../utils/PrivacyTerms";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
 import useToast from "../hooks/useToast";
 import { signUpUser } from "../redux/actions";
+import i18next from "i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type Props = NativeStackScreenProps<AppStackParams, "ProfileScreen">;
 
@@ -32,8 +34,10 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 	const [email, setEmail] = useState("");
 	const [fullName, setFullName] = useState("");
 	const [modalVisible, setModalVisible] = useState(false);
+	const [languageModalVisible, setLanguageModalVisible] = useState(false);
 	const fullNameRef = createRef<TextInput>();
 	const toggleModal = () => setModalVisible(!modalVisible);
+	const toggleLanguageModal = () => setLanguageModalVisible(!languageModalVisible);
 	const dispatch = useAppDispatch();
 	const handleSignUpModal = async () => {
 		if ((!email || !fullName) && modalVisible) {
@@ -100,6 +104,10 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 						<Text className='font-semibold text-lg'>{t("signupFree")}</Text>
 					</TouchableOpacity>
 				)}
+				<TouchableOpacity className='flex-row items-center gap-x-2 border-b my-2' onPress={toggleLanguageModal}>
+					<Ionicons name='language' size={20} color={"black"} />
+					<Text className='font-semibold text-lg'>{t("changeLanguage")}</Text>
+				</TouchableOpacity>
 			</Animated.View>
 			<Modal animationType='slide' transparent={true} visible={modalVisible} onRequestClose={toggleModal}>
 				<View style={styles.centeredView}>
@@ -152,6 +160,47 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 							</View>
 						</ScrollView>
 					</KeyboardAvoidingView>
+				</View>
+			</Modal>
+			<Modal
+				animationType='slide'
+				transparent={true}
+				visible={languageModalVisible}
+				onRequestClose={toggleLanguageModal}>
+				<View style={styles.centeredView}>
+					<View className='w-10/12 gap-y-3 px-5 bg-white rounded-xl py-5' style={commonStyles.smallBottomShadow}>
+						<Text className='font-semibold self-center text-lg'>{t("changeAppLangugage")}</Text>
+						<View className='flex-row items-center justify-between'>
+							<TouchableOpacity
+								className={`py-1 w-[40%] justify-center border-2 bg-white px-1.5 flex-row rounded-full ${
+									i18next.language === "tr" ? " border-green-700" : " border-black"
+								}`}
+								onPress={() => {
+									i18next.changeLanguage("tr");
+									AsyncStorage.setItem("appLang", "tr");
+									toggleLanguageModal();
+								}}>
+								<Text
+									className={`font-semibold  text-xl ${i18next.language === "tr" ? "text-green-700 " : "text-black"}`}>
+									{t("tr")}
+								</Text>
+							</TouchableOpacity>
+							<TouchableOpacity
+								className={`py-1 w-[40%] border-2 justify-center bg-white px-1.5 flex-row rounded-full ${
+									i18next.language === "en" ? " border-green-700" : " border-black"
+								}`}
+								onPress={() => {
+									i18next.changeLanguage("en");
+									AsyncStorage.setItem("appLang", "en");
+									toggleLanguageModal();
+								}}>
+								<Text
+									className={`font-semibold  text-xl ${i18next.language === "en" ? "text-green-700 " : "text-black"}`}>
+									{t("en")}
+								</Text>
+							</TouchableOpacity>
+						</View>
+					</View>
 				</View>
 			</Modal>
 			<View className='h-16'>

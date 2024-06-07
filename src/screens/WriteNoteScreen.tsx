@@ -34,13 +34,11 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 					})
 				);
 		} else {
-			console.log("here 2");
 			if (
 				route.params.note.title !== title ||
 				route.params.note.text !== note ||
 				route.params.note.categoryId !== selectedCategoryId
 			) {
-				console.log("here 3");
 				dispatch(
 					updateNote({
 						userId: currentUser?.id!,
