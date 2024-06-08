@@ -70,6 +70,7 @@ export const reducer = createSlice({
 				state.success = false;
 				state.error = false;
 				state.message = "";
+				state.savedNotes = [];
 			})
 			.addCase(saveNote.fulfilled, (state, action) => {
 				if (action.payload.status === HttpStatusCode.Ok) {
@@ -104,6 +105,7 @@ export const reducer = createSlice({
 				state.success = false;
 				state.error = false;
 				state.message = "";
+				state.savedNotes = [];
 			})
 			.addCase(updateNote.fulfilled, (state, action) => {
 				if (action.payload.status === HttpStatusCode.Ok) {
@@ -123,6 +125,7 @@ export const reducer = createSlice({
 				state.success = false;
 				state.error = false;
 				state.message = "";
+				state.savedNotes = [];
 			})
 			.addCase(deleteNote.fulfilled, (state, action) => {
 				if (action.payload.status === HttpStatusCode.Ok) {

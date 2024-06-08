@@ -2,6 +2,9 @@ import { HttpStatusCode } from "axios";
 import { supabase } from "../utils/supabase";
 import { CategoryType, NoteType, UserType } from "../utils/types";
 import { decode } from "base64-arraybuffer";
+import DeviceInfo from "react-native-device-info";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import * as RNLocalize from "react-native-localize";
 
 export const uploadImageToSupabase = async (
 	base64Image: string,
@@ -104,6 +107,13 @@ export const CreateCategoryService = async (body: CategoryType) => {
 export const GetCurrentUserService = async (deviceId: string) => {
 	try {
 		let currentUser = await supabase.from("users").select("*").filter("deviceId", "eq", deviceId).single();
+		let updatedUser: any = undefined;
+		const uniqueID = DeviceInfo.getUniqueIdSync();
+		if (uniqueID !== currentUser.data.deviceId) {
+			const country = RNLocalize.getCountry();
+			updatedUser = await supabase.from("users").update({ deviceId: uniqueID, country }).eq("id", currentUser.data.id);
+			await AsyncStorage.setItem("deviceId", uniqueID);
+		}
 		let savedNotes = await supabase
 			.from("notes")
 			.select("*")
@@ -117,7 +127,7 @@ export const GetCurrentUserService = async (deviceId: string) => {
 
 		return {
 			data: {
-				user: currentUser.data,
+				user: updatedUser === undefined ? currentUser.data : updatedUser.data,
 				savedNotes: savedNotes.data,
 				categories: categories.data,
 			},

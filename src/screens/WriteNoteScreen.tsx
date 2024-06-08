@@ -1,6 +1,6 @@
-import { KeyboardAvoidingView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { KeyboardAvoidingView, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
-import Animated, { Easing, FadeInLeft, SlideInUp } from "react-native-reanimated";
+import Animated, { Easing, SlideInUp } from "react-native-reanimated";
 import { commonStyles } from "../utils/commonStyles";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";

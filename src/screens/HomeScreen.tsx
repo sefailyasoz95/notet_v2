@@ -12,12 +12,12 @@ import { Ionicons } from "@expo/vector-icons";
 import { commonStyles } from "../utils/commonStyles";
 import { FlashList } from "@shopify/flash-list";
 import NoteItem from "../components/NoteItem";
-import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
+import { DEVICE_HEIGHT } from "../utils/constants";
 import useToast from "../hooks/useToast";
 import { SafeAreaView } from "react-native-safe-area-context";
+import * as StoreReview from "expo-store-review";
 
 type Props = NativeStackScreenProps<AppStackParams, "HomeScreen">;
-
 const HomeScreen = ({ navigation, route }: Props) => {
 	const { t } = useTranslation();
 	const { currentUser, onboardingPassed, savedNotes, loading, categories, success, error, message } = useAppSelector(
@@ -31,14 +31,13 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
 	const fetchUser = async () => {
 		const deviceId = await AsyncStorage.getItem("deviceId");
-		console.log("deviceId: ", deviceId);
-
 		dispatch(getCurrentUser(deviceId!));
 	};
 
 	useEffect(() => {
 		fetchUser();
 	}, [onboardingPassed]);
+
 	useEffect(() => {
 		if (success && !loading) {
 			showToast({ message, icon: "checkmark-sharp", type: "success" });
@@ -60,6 +59,13 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	// 		channels.unsubscribe();
 	// 	};
 	// }, []);
+	useEffect(() => {
+		(async () => {
+			if (savedNotes.length > 0 && savedNotes.length % 2 === 0) {
+				await StoreReview.requestReview();
+			}
+		})();
+	}, [savedNotes]);
 
 	useEffect(() => {
 		if (currentUser && !categories.length) {
@@ -88,56 +94,58 @@ const HomeScreen = ({ navigation, route }: Props) => {
 					<ActivityIndicator size={50} color={"white"} />
 				</Animated.View>
 			)}
-			<Animated.View
-				className='bg-black absolute top-0 z-20 rounded-b-3quarter h-1/6 w-full justify-center px-5'
-				style={commonStyles.headerShadow}
-				entering={SlideInUp.duration(500).easing(Easing.elastic(0.1))}>
-				<View className='flex-row items-center justify-between'>
-					<View className='flex-row items-center gap-x-2'>
-						<Image
-							className='rounded-full w-10 h-10'
-							source={require("../../assets/favicon.png")}
-							contentFit='cover'
-							transition={100}
-						/>
-						<Text className='text-white font-semibold'>
-							{t("hello")},
-							{currentUser && currentUser?.fullName
-								? ` ${currentUser?.fullName.split(" ")[0]}`
-								: ` Guest${currentUser?.deviceId.slice(0, 5)}`}
-						</Text>
-					</View>
-					<TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
-						<Ionicons name='person-sharp' size={25} color={"white"} />
-					</TouchableOpacity>
-				</View>
-			</Animated.View>
-			<FlashList
-				estimatedItemSize={200}
-				contentContainerStyle={{ paddingTop: DEVICE_HEIGHT * 0.18 }}
-				data={savedNotes}
-				renderItem={({ item, index }) => <NoteItem note={item} key={index} index={index} />}
-				ListEmptyComponent={() =>
-					loading ? (
-						<></>
-					) : (
-						<NoteItem
-							note={{
-								categoryId: 0,
-								isComplete: false,
-								text: "",
-								title: t("noNotesYet"),
-								userId: -1,
-								created_at: currentUser?.created_at,
-								id: -1,
-							}}
-							index={1}
-						/>
-					)
-				}
-			/>
-			{/* TODO: ENABLE CATEGORY ADD FEATURE IN THE NEXT RELEASE */}
-			{/* <View
+			{typeof currentUser !== undefined && (
+				<>
+					<Animated.View
+						className='bg-black absolute top-0 z-20 rounded-b-3quarter h-1/6 w-full justify-center px-5'
+						style={commonStyles.headerShadow}
+						entering={SlideInUp.duration(500).easing(Easing.elastic(0.1))}>
+						<View className='flex-row items-center justify-between'>
+							<View className='flex-row items-center gap-x-2'>
+								<Image
+									className='rounded-full w-10 h-10'
+									source={require("../../assets/favicon.png")}
+									contentFit='cover'
+									transition={100}
+								/>
+								<Text className='text-white font-semibold'>
+									{t("hello")},
+									{currentUser && currentUser?.fullName
+										? ` ${currentUser?.fullName.split(" ")[0]}`
+										: ` Guest${currentUser?.deviceId.split("-")[0]}`}
+								</Text>
+							</View>
+							<TouchableOpacity onPress={() => navigation.navigate("ProfileScreen")}>
+								<Ionicons name='person-sharp' size={25} color={"white"} />
+							</TouchableOpacity>
+						</View>
+					</Animated.View>
+					<FlashList
+						estimatedItemSize={200}
+						contentContainerStyle={{ paddingTop: DEVICE_HEIGHT * 0.18 }}
+						data={savedNotes}
+						renderItem={({ item, index }) => <NoteItem note={item} key={index} index={index} />}
+						ListEmptyComponent={() =>
+							loading ? (
+								<></>
+							) : (
+								<NoteItem
+									note={{
+										categoryId: 0,
+										isComplete: false,
+										text: "",
+										title: t("noNotesYet"),
+										userId: -1,
+										created_at: currentUser?.created_at,
+										id: -1,
+									}}
+									index={1}
+								/>
+							)
+						}
+					/>
+					{/* TODO: ENABLE CATEGORY ADD FEATURE IN THE NEXT RELEASE */}
+					{/* <View
 				style={{ paddingTop: DEVICE_HEIGHT * 0.18 }}
 				className='flex-row items-center justify-between w-10/12 self-center'>
 				<TouchableOpacity
@@ -152,7 +160,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 				</TouchableOpacity>
 			</View> */}
 
-			{/* <ScrollView
+					{/* <ScrollView
 				horizontal
 				scrollEnabled={false}
 				showsHorizontalScrollIndicator={false}
@@ -198,20 +206,22 @@ const HomeScreen = ({ navigation, route }: Props) => {
 					/>
 				</View>
 			</ScrollView> */}
-			<Animated.View
-				className={"w-10 self-end h-10 items-center right-7 bottom-12"}
-				style={commonStyles.smallBottomShadow}
-				entering={SlideInRight.duration(500).easing(Easing.elastic(0.5))}>
-				<TouchableOpacity
-					className='rounded-full border-2 bg-white border-green-700'
-					onPress={() => {
-						navigation.navigate("WriteNoteScreen", {
-							categoryId: selectedCategoryId || categories[0].id!,
-						});
-					}}>
-					<Ionicons name='add-sharp' size={35} color={"green"} />
-				</TouchableOpacity>
-			</Animated.View>
+					<Animated.View
+						className={"w-10 self-end h-10 items-center right-7 bottom-12"}
+						style={commonStyles.smallBottomShadow}
+						entering={SlideInRight.duration(500).easing(Easing.elastic(0.5))}>
+						<TouchableOpacity
+							className='rounded-full border-2 bg-white border-green-700'
+							onPress={() => {
+								navigation.navigate("WriteNoteScreen", {
+									categoryId: selectedCategoryId || categories[0].id!,
+								});
+							}}>
+							<Ionicons name='add-sharp' size={35} color={"green"} />
+						</TouchableOpacity>
+					</Animated.View>
+				</>
+			)}
 		</SafeAreaView>
 	);
 };

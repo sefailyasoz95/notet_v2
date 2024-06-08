@@ -9,25 +9,26 @@ import {
 	TextInput,
 	ActivityIndicator,
 	Alert,
+	Linking,
 } from "react-native";
-import React, { createRef, useEffect, useState } from "react";
+import React, { createRef, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";
-import Animated, { Easing, FadeInUp, SlideInUp } from "react-native-reanimated";
+import Animated, { Easing, FadeInLeft, FadeInUp, SlideInUp } from "react-native-reanimated";
 import { commonStyles } from "../utils/commonStyles";
-import { Image } from "expo-image";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { useTranslation } from "react-i18next";
 import { Entypo, Ionicons } from "@expo/vector-icons";
-import { AboutUs, PrivacyPolicy, TermsOfService } from "../utils/PrivacyTerms";
-import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
+import { PrivacyPolicy, TermsOfService } from "../utils/PrivacyTerms";
+import { DEVICE_HEIGHT, DEVICE_WIDTH, Languages } from "../utils/constants";
 import useToast from "../hooks/useToast";
 import { updateUserInfo } from "../redux/actions";
 import i18next from "i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import appJson from "../../app.json";
+import * as StoreReview from "expo-store-review";
 
 type Props = NativeStackScreenProps<AppStackParams, "ProfileScreen">;
-
 const ProfileScreen = ({ navigation, route }: Props) => {
 	const { currentUser, loading, success, message, error } = useAppSelector((state) => state.global);
 	const { t } = useTranslation();
@@ -56,6 +57,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 		setTimeout(() => {
 			toggleModal();
 		}, 500);
+		await StoreReview.requestReview();
 	};
 	const handleAccountDelete = () => {
 		Alert.alert(t("areYouSure"), t("keepYourNotes"), [
@@ -153,6 +155,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 								<Text className='text-2xl text-black font-semibold'>{t("signupFree")}</Text>
 								<View className='items-center gap-y-3 justify-between w-full px-2'>
 									<TextInput
+										key={"email"}
 										className='border w-full rounded-xl px-2 py-1.5'
 										autoComplete='email'
 										placeholder={t("email")}
@@ -166,6 +169,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 										className='border w-full rounded-xl px-2 py-1.5'
 										placeholder={t("fullName")}
 										autoComplete='name'
+										key={"fullName"}
 										onChangeText={setFullName}
 										editable={!loading}
 										value={fullName}
@@ -205,38 +209,43 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 							<Ionicons name='close-circle' size={30} color={"red"} />
 						</TouchableOpacity>
 						<View className='mt-10 mb-5'>
-							<TouchableOpacity
-								className={`py-1 w-full items-center justify-between bg-white px-1.5 flex-row`}
-								onPress={() => {
-									i18next.changeLanguage("tr");
-									AsyncStorage.setItem("appLang", "tr");
-									toggleLanguageModal();
-								}}>
-								<Text
-									className={`font-semibold  text-xl ${i18next.language === "tr" ? "text-green-700 " : "text-black"}`}>
-									{t("tr")}
-								</Text>
-								{i18next.language === "tr" && <Ionicons name='checkmark-sharp' size={30} color={"green"} />}
-							</TouchableOpacity>
-							<TouchableOpacity
-								className={`py-1 w-full items-center mt-1 justify-between bg-white px-1.5 flex-row`}
-								onPress={() => {
-									i18next.changeLanguage("en");
-									AsyncStorage.setItem("appLang", "en");
-									toggleLanguageModal();
-								}}>
-								<Text
-									className={`font-semibold  text-xl ${i18next.language === "en" ? "text-green-700 " : "text-black"}`}>
-									{t("en")}
-								</Text>
-								{i18next.language === "en" && <Ionicons name='checkmark-sharp' size={30} color={"green"} />}
-							</TouchableOpacity>
+							{Languages.map((lang, index) => (
+								<Animated.View entering={FadeInLeft.delay(300 * index + 1)}>
+									<TouchableOpacity
+										key={index}
+										className={`py-1 w-full items-center justify-between bg-white px-1.5 flex-row`}
+										onPress={() => {
+											i18next.changeLanguage(lang);
+											AsyncStorage.setItem("appLang", lang);
+											toggleLanguageModal();
+										}}>
+										<Text
+											className={`font-semibold  text-xl ${
+												i18next.language === lang ? "text-green-700 " : "text-black"
+											}`}>
+											{t(lang)}
+										</Text>
+										{i18next.language === lang && <Ionicons name='checkmark-sharp' size={30} color={"green"} />}
+									</TouchableOpacity>
+								</Animated.View>
+							))}
 						</View>
 					</View>
 				</View>
 			</Modal>
-			<View className='h-16'>
-				<Text className='text-black font-semibold text-sm self-center'>App By Softwarify - Version 3.0.2</Text>
+			<View className='h-16 flex-row items-center self-center mb-5'>
+				<TouchableOpacity
+					className='border-b'
+					onPress={async () => {
+						const linkedinURL = "http://linkedin.com/company/softwarify";
+						const canOpen = await Linking.canOpenURL(linkedinURL);
+						if (canOpen) {
+							Linking.openURL(linkedinURL);
+						}
+					}}>
+					<Text className='text-black font-semibold text-sm self-center'>By Softwarify</Text>
+				</TouchableOpacity>
+				<Text className='text-black font-semibold text-sm self-center'>{` - Version ${appJson.expo.version}`}</Text>
 			</View>
 		</View>
 	);

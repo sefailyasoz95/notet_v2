@@ -17,9 +17,13 @@ const Main = () => {
 	});
 	const checkOnboarding = async () => {
 		// await AsyncStorage.removeItem("onBoardingPassed");
+		// await AsyncStorage.removeItem("appLang");
+
 		const isPassed = await AsyncStorage.getItem("onBoardingPassed");
 		const appLang = await AsyncStorage.getItem("appLang");
 		if (isPassed !== null) {
+			console.log("appLang: ", appLang);
+
 			if (appLang !== null) {
 				i18next.changeLanguage(appLang);
 			}

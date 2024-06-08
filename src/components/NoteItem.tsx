@@ -24,6 +24,8 @@ type Props = {
 moment.locale(i18next.language);
 
 const NoteItem = ({ note, index }: Props) => {
+	console.log("note: ", note, " => index: ", index);
+
 	const navigation = useNavigation<NavigationProp<AppStackParams>>();
 	const { currentUser } = useAppSelector((state) => state.global);
 	const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -189,3 +191,4 @@ const styles = StyleSheet.create({
 		width: DEVICE_WIDTH * 0.91,
 	},
 });
+// https://cloud.mail.ru/public/29Rc/fZHpqYiff

@@ -1,5 +1,5 @@
 import { Dimensions } from "react-native";
-import Animated, { SharedTransition, withSpring, WithSpringConfig } from "react-native-reanimated";
+import { SharedTransition, withSpring } from "react-native-reanimated";
 
 const SPRING_CONFIG = {
 	mass: 1,
@@ -36,3 +36,5 @@ export const supabaseDBpassword = "AlpEge2024!!";
 export const supabaseURL = "https://ygdgpwacbomfcpljqlwv.supabase.co";
 export const supabaseAPIkey =
 	"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlnZGdwd2FjYm9tZmNwbGpxbHd2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTc0NTM0MDYsImV4cCI6MjAzMzAyOTQwNn0.axRrTZsF0v1wmDdceAdBGF6-8whcZZdsd9ecsfmEwos";
+
+export const Languages = ["en", "tr", "de"];

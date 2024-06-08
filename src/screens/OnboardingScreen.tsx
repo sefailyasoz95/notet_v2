@@ -14,17 +14,19 @@ import { createUser, getCurrentUser } from "../redux/actions";
 import * as Localize from "expo-localization";
 import { setonboardingPassed } from "../redux/reducers";
 type Props = NativeStackScreenProps<AuthStackParams, "OnboardingScreen">;
+import DeviceInfo from "react-native-device-info";
+import * as RNLocalize from "react-native-localize";
 
 const OnboardingScreen = ({ navigation, route }: Props) => {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
 	const onGetStarted = async () => {
 		await AsyncStorage.setItem("onBoardingPassed", "true");
-		const deviceId = new Date().getTime().toString();
-		await AsyncStorage.setItem("deviceId", deviceId);
+		const deviceId = DeviceInfo.getUniqueIdSync();
+		const country = RNLocalize.getCountry();
 		dispatch(
 			createUser({
-				country: Localize.getLocales()[0].regionCode ?? "",
+				country: country,
 				email: "",
 				fullName: "",
 				isPremium: false,
@@ -77,7 +79,7 @@ const OnboardingScreen = ({ navigation, route }: Props) => {
 				renderItem={({ item, index }) => (
 					<View key={index} className='gap-y-5 mt-20 self-center items-center'>
 						<LottieView source={item.animation} autoPlay loop style={styles.animation} />
-						<Text className='text-5xl w-4/5 text-black font-semibold'>{t(item.title)}</Text>
+						<Text className='text-4xl w-4/5 text-black font-bold'>{t(item.title)}</Text>
 						<Text className='text-xl font-medium text-gray-600'>{t(item.text)}</Text>
 					</View>
 				)}
