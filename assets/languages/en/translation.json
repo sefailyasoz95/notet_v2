@@ -56,5 +56,10 @@
 	"changeLanguage": "Change Language",
 	"changeAppLangugage": "Change App Language",
 	"tr": "Turkish",
-	"en": "English"
+	"en": "English",
+	"deleteAccount": "Delete Account",
+	"areYouSure": "Are You Sure to Delete?",
+	"keepYourNotes": "You can keep using app and your notes but email and full name informations will be deleted.",
+	"accountDeleted": "Account Deleted",
+	"notValidEmail": "Please enter a valid email"
 }

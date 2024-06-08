@@ -56,5 +56,10 @@
 	"changeLanguage": "Dili Değiştir",
 	"changeAppLangugage": "Uygulama dilini değiştir",
 	"tr": "Türkçe",
-	"en": "İngilizce"
+	"en": "İngilizce",
+	"deleteAccount": "Hesabı Sil",
+	"areYouSure": "Silmek İstediğine Emin Misin?",
+	"keepYourNotes": "Uygulamayı ve notlarınızı kullanmaya devam edebilirsiniz, ancak e-posta ve ad soyad bilgileri silinecektir.",
+	"accountDeleted": "Hesap Silindi",
+	"notValidEmail": "Lütfen geçerli eposta adresi giriniz"
 }

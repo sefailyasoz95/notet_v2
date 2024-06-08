@@ -31,6 +31,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
 
 	const fetchUser = async () => {
 		const deviceId = await AsyncStorage.getItem("deviceId");
+		console.log("deviceId: ", deviceId);
+
 		dispatch(getCurrentUser(deviceId!));
 	};
 

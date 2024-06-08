@@ -1,5 +1,13 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { createCategory, createUser, deleteNote, getCurrentUser, saveNote, signUpUser, updateNote } from "./actions";
+import {
+	createCategory,
+	createUser,
+	deleteNote,
+	getCurrentUser,
+	saveNote,
+	updateUserInfo,
+	updateNote,
+} from "./actions";
 import { HttpStatusCode } from "axios";
 import { InitialState, NoteType } from "../utils/types";
 
@@ -128,14 +136,14 @@ export const reducer = createSlice({
 				state.loading = false;
 				// *********** deleteNote END *********** \\
 			})
-			// *********** signUpUser START *********** \\
-			.addCase(signUpUser.pending, (state) => {
+			// *********** updateUserInfo START *********** \\
+			.addCase(updateUserInfo.pending, (state) => {
 				state.loading = true;
 				state.success = false;
 				state.error = false;
 				state.message = "";
 			})
-			.addCase(signUpUser.fulfilled, (state, action) => {
+			.addCase(updateUserInfo.fulfilled, (state, action) => {
 				if (action.payload.status === HttpStatusCode.Ok) {
 					state.currentUser = action.payload.data;
 					state.success = true;
@@ -144,7 +152,7 @@ export const reducer = createSlice({
 				}
 				state.message = action.payload.message;
 				state.loading = false;
-				// *********** signUpUser END *********** \\
+				// *********** updateUserInfo END *********** \\
 			});
 	},
 });

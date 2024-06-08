@@ -224,7 +224,7 @@ export const DeleteNoteService = async (_data: { id: number; userId: number }) =
 	}
 };
 
-export const SignUpUserService = async (body: { email: string; fullName: string; userId: number }) => {
+export const UpdateUserInfoService = async (body: { email: string; fullName: string; userId: number }) => {
 	try {
 		let { data, error } = await supabase
 			.from("users")
@@ -236,7 +236,7 @@ export const SignUpUserService = async (body: { email: string; fullName: string;
 			return {
 				data: currentUser.data,
 				status: HttpStatusCode.Ok,
-				message: "signUpThanks",
+				message: body.fullName ? "signUpThanks" : "accountDeleted",
 			};
 		} else {
 			return {

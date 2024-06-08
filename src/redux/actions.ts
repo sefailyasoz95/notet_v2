@@ -5,9 +5,9 @@ import {
 	DeleteNoteService,
 	GetCurrentUserService,
 	SaveNoteService,
-	SignUpUserService,
+	UpdateUserInfoService,
 	UpdateNoteService,
-	// SignUpUserService,
+	// UpdateUserInfoService,
 } from "./services";
 import { CategoryType, NoteType, UserType } from "../utils/types";
 
@@ -104,11 +104,11 @@ export const deleteNote = createAsyncThunk(
 	}
 );
 
-export const signUpUser = createAsyncThunk(
-	"auth/signUpUser",
+export const updateUserInfo = createAsyncThunk(
+	"auth/updateUserInfo",
 	async (body: { email: string; fullName: string; userId: number }, thunkAPI) => {
 		try {
-			return await SignUpUserService(body);
+			return await UpdateUserInfoService(body);
 		} catch (error: any) {
 			const message =
 				(error.response && error.response.data && error.response.data.message) || error.message || error.toString();

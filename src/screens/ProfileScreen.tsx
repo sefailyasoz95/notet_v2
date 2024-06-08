@@ -8,6 +8,7 @@ import {
 	View,
 	TextInput,
 	ActivityIndicator,
+	Alert,
 } from "react-native";
 import React, { createRef, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -21,7 +22,7 @@ import { Entypo, Ionicons } from "@expo/vector-icons";
 import { AboutUs, PrivacyPolicy, TermsOfService } from "../utils/PrivacyTerms";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
 import useToast from "../hooks/useToast";
-import { signUpUser } from "../redux/actions";
+import { updateUserInfo } from "../redux/actions";
 import i18next from "i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -44,12 +45,39 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 			showToast({ message: "signUpWarning", type: "warning", icon: "warning-sharp" });
 			return;
 		}
-		dispatch(signUpUser({ email, fullName, userId: currentUser?.id! }));
+		const emailRegex: RegExp = /^[a-zA-Z0-9_\u00C0-\u017F]+@[a-zA-Z0-9_\u00C0-\u017F]+\.[a-zA-Z0-9_\u00C0-\u017F]+$/;
+		if (!emailRegex.test(email)) {
+			showToast({ message: "notValidEmail", type: "error", icon: "close-sharp" });
+			return;
+		}
+		dispatch(updateUserInfo({ email, fullName, userId: currentUser?.id! }));
+		setEmail("");
+		setFullName("");
 		setTimeout(() => {
 			toggleModal();
-		}, 1500);
+		}, 500);
 	};
-
+	const handleAccountDelete = () => {
+		Alert.alert(t("areYouSure"), t("keepYourNotes"), [
+			{
+				text: t("delete"),
+				style: "destructive",
+				onPress: () => {
+					dispatch(
+						updateUserInfo({
+							email: "",
+							fullName: "",
+							userId: currentUser?.id!,
+						})
+					);
+				},
+			},
+			{
+				text: t("cancel"),
+				style: "cancel",
+			},
+		]);
+	};
 	return (
 		<View className='flex-1'>
 			<Animated.View
@@ -98,10 +126,15 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 					<Entypo name='heart' size={20} color={"black"} />
 					<Text className='font-semibold text-lg'>{t("aboutUs")}</Text>
 				</TouchableOpacity> */}
-				{!currentUser?.email && (
+				{!currentUser?.email ? (
 					<TouchableOpacity className='flex-row items-center gap-x-2 border-b my-2' onPress={toggleModal}>
 						<Ionicons name='person-add' size={20} color={"black"} />
 						<Text className='font-semibold text-lg'>{t("signupFree")}</Text>
+					</TouchableOpacity>
+				) : (
+					<TouchableOpacity className='flex-row items-center gap-x-2 border-b my-2' onPress={handleAccountDelete}>
+						<Ionicons name='person-remove' size={20} color={"black"} />
+						<Text className='font-semibold text-lg'>{t("deleteAccount")}</Text>
 					</TouchableOpacity>
 				)}
 				<TouchableOpacity className='flex-row items-center gap-x-2 border-b my-2' onPress={toggleLanguageModal}>
@@ -128,8 +161,6 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 										value={email}
 										inputMode='email'
 										editable={!loading}
-										// returnKeyType='go'
-										// onSubmitEditing={fullNameRef.current?.focus}
 									/>
 									<TextInput
 										className='border w-full rounded-xl px-2 py-1.5'
@@ -168,13 +199,14 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 				visible={languageModalVisible}
 				onRequestClose={toggleLanguageModal}>
 				<View style={styles.centeredView}>
-					<View className='w-10/12 gap-y-3 px-5 bg-white rounded-xl py-5' style={commonStyles.smallBottomShadow}>
-						<Text className='font-semibold self-center text-lg'>{t("changeAppLangugage")}</Text>
-						<View className='flex-row items-center justify-between'>
+					<View className='w-11/12 gap-y-5 px-5 bg-white rounded-xl' style={commonStyles.smallBottomShadow}>
+						<TouchableOpacity className='flex-row items-center justify-between' onPress={toggleLanguageModal}>
+							<Text className='font-semibold self-center text-xl'>{t("changeAppLangugage")}</Text>
+							<Ionicons name='close-circle' size={30} color={"red"} />
+						</TouchableOpacity>
+						<View className='mt-10 mb-5'>
 							<TouchableOpacity
-								className={`py-1 w-[40%] justify-center border-2 bg-white px-1.5 flex-row rounded-full ${
-									i18next.language === "tr" ? " border-green-700" : " border-black"
-								}`}
+								className={`py-1 w-full items-center justify-between bg-white px-1.5 flex-row`}
 								onPress={() => {
 									i18next.changeLanguage("tr");
 									AsyncStorage.setItem("appLang", "tr");
@@ -184,11 +216,10 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 									className={`font-semibold  text-xl ${i18next.language === "tr" ? "text-green-700 " : "text-black"}`}>
 									{t("tr")}
 								</Text>
+								{i18next.language === "tr" && <Ionicons name='checkmark-sharp' size={30} color={"green"} />}
 							</TouchableOpacity>
 							<TouchableOpacity
-								className={`py-1 w-[40%] border-2 justify-center bg-white px-1.5 flex-row rounded-full ${
-									i18next.language === "en" ? " border-green-700" : " border-black"
-								}`}
+								className={`py-1 w-full items-center mt-1 justify-between bg-white px-1.5 flex-row`}
 								onPress={() => {
 									i18next.changeLanguage("en");
 									AsyncStorage.setItem("appLang", "en");
@@ -198,13 +229,14 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 									className={`font-semibold  text-xl ${i18next.language === "en" ? "text-green-700 " : "text-black"}`}>
 									{t("en")}
 								</Text>
+								{i18next.language === "en" && <Ionicons name='checkmark-sharp' size={30} color={"green"} />}
 							</TouchableOpacity>
 						</View>
 					</View>
 				</View>
 			</Modal>
 			<View className='h-16'>
-				<Text className='text-black font-semibold text-sm self-center'>App By Softwarify - Version 3.0.0</Text>
+				<Text className='text-black font-semibold text-sm self-center'>App By Softwarify - Version 3.0.1</Text>
 			</View>
 		</View>
 	);
