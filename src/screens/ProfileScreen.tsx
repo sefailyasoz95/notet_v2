@@ -236,7 +236,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 				</View>
 			</Modal>
 			<View className='h-16'>
-				<Text className='text-black font-semibold text-sm self-center'>App By Softwarify - Version 3.0.1</Text>
+				<Text className='text-black font-semibold text-sm self-center'>App By Softwarify - Version 3.0.2</Text>
 			</View>
 		</View>
 	);
