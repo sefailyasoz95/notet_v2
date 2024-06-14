@@ -62,5 +62,10 @@
 	"areYouSure": "Bist du sicher, dass du löschen möchtest?",
 	"keepYourNotes": "Du kannst die App und deine Notizen weiterhin verwenden, aber E-Mail- und Vollnamen-Informationen werden gelöscht.",
 	"accountDeleted": "Konto gelöscht",
-	"notValidEmail": "Bitte gib eine gültige E-Mail-Adresse ein"
+	"notValidEmail": "Bitte gib eine gültige E-Mail-Adresse ein",
+	"title": "Titel",
+	"untitled": "Ohne Titel",
+	"ratingSentence": "Wie zufrieden sind Sie mit NotEt? Bewerten Sie uns!",
+	"notNow": "Nicht jetzt",
+	"thanksForRating": "Ihre Bewertung wurde übernommen, danke!"
 }

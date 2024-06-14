@@ -1,18 +1,18 @@
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { createRef, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";
 import Animated, { Easing, FadeIn, SlideInRight, SlideInUp } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "../redux/store";
-import { createCategory, getCurrentUser } from "../redux/actions";
+import { createCategory, getCurrentUser, updateUserInfo } from "../redux/actions";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Image } from "expo-image";
 import { Ionicons } from "@expo/vector-icons";
 import { commonStyles } from "../utils/commonStyles";
 import { FlashList } from "@shopify/flash-list";
 import NoteItem from "../components/NoteItem";
-import { DEVICE_HEIGHT } from "../utils/constants";
+import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
 import useToast from "../hooks/useToast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as StoreReview from "expo-store-review";
@@ -27,8 +27,10 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	const [tabs, setTabs] = useState<"notes" | "categories">("notes");
 	const dispatch = useAppDispatch();
 	const { showToast } = useToast();
+	const [ratingModal, setRatingModal] = useState<boolean>(false);
+	const [givenRate, setGivenRate] = useState<number>(4);
 	const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id);
-
+	const toggleModal = () => setRatingModal(!ratingModal);
 	const fetchUser = async () => {
 		const deviceId = await AsyncStorage.getItem("deviceId");
 		dispatch(getCurrentUser(deviceId!));
@@ -61,8 +63,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	// }, []);
 	useEffect(() => {
 		(async () => {
-			if (savedNotes.length > 0 && savedNotes.length % 2 === 0) {
-				await StoreReview.requestReview();
+			if (savedNotes.length > 0 && savedNotes.length % 2 === 0 && !currentUser?.rating) {
+				toggleModal();
 			}
 		})();
 	}, [savedNotes]);
@@ -84,6 +86,12 @@ const HomeScreen = ({ navigation, route }: Props) => {
 			scrollRef.current?.scrollTo({ animated: true, x: 0, y: 0 });
 		}
 		setTabs((prev) => (prev === "notes" ? "categories" : "notes"));
+	};
+	const handleRating = async (rate: number) => {
+		setGivenRate(rate);
+		dispatch(updateUserInfo({ rating: rate, id: currentUser?.id }));
+		toggleModal();
+		await StoreReview.requestReview();
 	};
 	return (
 		<SafeAreaView className='flex-1 bg-white justify-end' edges={["left", "right"]}>
@@ -216,14 +224,53 @@ const HomeScreen = ({ navigation, route }: Props) => {
 								navigation.navigate("WriteNoteScreen", {
 									categoryId: selectedCategoryId || categories[0].id!,
 								});
-							}}>
+							}}
+							// onPress={toggleModal}
+						>
 							<Ionicons name='add-sharp' size={35} color={"green"} />
 						</TouchableOpacity>
 					</Animated.View>
 				</>
 			)}
+			<Modal animationType='fade' transparent={true} visible={ratingModal} onRequestClose={toggleModal}>
+				<View style={styles.centeredView}>
+					<View
+						className='items-center justify-around w-11/12 gap-y-5 bg-white rounded-2xl pt-2 pb-5 border-2'
+						style={commonStyles.largeBottomShadow}>
+						<Text className='font-semibold text-xl text-center mx-5'>{t("ratingSentence")}</Text>
+						<View className='flex-row items-center'>
+							{[1, 2, 3, 4, 5].map((rate, index) => (
+								<TouchableOpacity onPress={() => handleRating(rate)} key={index}>
+									<Ionicons key={index} name={rate <= givenRate ? "star" : "star-outline"} size={25} color={"gold"} />
+								</TouchableOpacity>
+							))}
+						</View>
+						<TouchableOpacity
+							className='w-1/3 items-center rounded-xl mt-2 py-1 justify-center bg-black'
+							onPress={toggleModal}>
+							<Text className='text-white font-semibold text-lg '>{t("notNow")}</Text>
+						</TouchableOpacity>
+					</View>
+				</View>
+			</Modal>
 		</SafeAreaView>
 	);
 };
 
 export default HomeScreen;
+
+const styles = StyleSheet.create({
+	centeredView: {
+		justifyContent: "center",
+		alignItems: "center",
+		marginTop: 22,
+		// backgroundColor: "rgba(0,0,0,0.4)",
+		flex: 1,
+	},
+	pickerStyle: {
+		backgroundColor: "rgba(0,0,0,0.4)",
+		borderRadius: 20,
+		overflow: "hidden",
+		width: DEVICE_WIDTH * 0.91,
+	},
+});

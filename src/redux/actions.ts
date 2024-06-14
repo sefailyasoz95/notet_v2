@@ -104,19 +104,16 @@ export const deleteNote = createAsyncThunk(
 	}
 );
 
-export const updateUserInfo = createAsyncThunk(
-	"auth/updateUserInfo",
-	async (body: { email: string; fullName: string; userId: number }, thunkAPI) => {
-		try {
-			return await UpdateUserInfoService(body);
-		} catch (error: any) {
-			const message =
-				(error.response && error.response.data && error.response.data.message) || error.message || error.toString();
-			return {
-				data: undefined,
-				status: 400,
-				message,
-			};
-		}
+export const updateUserInfo = createAsyncThunk("auth/updateUserInfo", async (body: Partial<UserType>, thunkAPI) => {
+	try {
+		return await UpdateUserInfoService(body);
+	} catch (error: any) {
+		const message =
+			(error.response && error.response.data && error.response.data.message) || error.message || error.toString();
+		return {
+			data: undefined,
+			status: 400,
+			message,
+		};
 	}
-);
+});

@@ -234,19 +234,16 @@ export const DeleteNoteService = async (_data: { id: number; userId: number }) =
 	}
 };
 
-export const UpdateUserInfoService = async (body: { email: string; fullName: string; userId: number }) => {
+export const UpdateUserInfoService = async (body: Partial<UserType>) => {
 	try {
-		let { data, error } = await supabase
-			.from("users")
-			.update({ fullName: body.fullName, email: body.email })
-			.eq("id", body.userId);
+		let { data, error } = await supabase.from("users").update(body).eq("id", body.id);
 
 		if (!error) {
-			let currentUser = await supabase.from("users").select("*").filter("id", "eq", body.userId).single();
+			let currentUser = await supabase.from("users").select("*").filter("id", "eq", body.id).single();
 			return {
 				data: currentUser.data,
 				status: HttpStatusCode.Ok,
-				message: body.fullName ? "signUpThanks" : "accountDeleted",
+				message: body.fullName ? "signUpThanks" : body.rating ? "thanksForRating" : "accountDeleted",
 			};
 		} else {
 			return {

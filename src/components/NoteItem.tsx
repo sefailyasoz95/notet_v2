@@ -5,7 +5,7 @@ import { AppStackParams, NoteType } from "../utils/types";
 import { commonStyles } from "../utils/commonStyles";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { Entypo } from "@expo/vector-icons";
-import moment from "moment";
+import moment from "moment/min/moment-with-locales";
 import i18next from "i18next";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { deleteNote, updateNote } from "../redux/actions";
@@ -21,10 +21,9 @@ type Props = {
 	note: NoteType;
 	index: number;
 };
-moment.locale(i18next.language);
 
 const NoteItem = ({ note, index }: Props) => {
-	console.log("note: ", note, " => index: ", index);
+	moment.locale(i18next.language);
 
 	const navigation = useNavigation<NavigationProp<AppStackParams>>();
 	const { currentUser } = useAppSelector((state) => state.global);

@@ -63,6 +63,7 @@ export type UserType = {
 	fullName: string;
 	isPremium: boolean;
 	country: string;
+	rating?: number;
 };
 export type CategoryType = {
 	id?: number;

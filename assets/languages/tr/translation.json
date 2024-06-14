@@ -62,5 +62,10 @@
 	"areYouSure": "Silmek İstediğine Emin Misin?",
 	"keepYourNotes": "Uygulamayı ve notlarınızı kullanmaya devam edebilirsiniz, ancak e-posta ve ad soyad bilgileri silinecektir.",
 	"accountDeleted": "Hesap Silindi",
-	"notValidEmail": "Lütfen geçerli eposta adresi giriniz"
+	"notValidEmail": "Lütfen geçerli eposta adresi giriniz",
+	"title": "Başlık",
+	"untitled": "Başlıksız",
+	"ratingSentence": "NotEt'ten ne kadar memnunsunuz ? Bizi puanlayın!",
+	"notNow": "Şimdi değil",
+	"thanksForRating": "Derecelendirmeniz kaydedildi, teşekkürler!"
 }

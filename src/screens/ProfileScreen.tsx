@@ -51,7 +51,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 			showToast({ message: "notValidEmail", type: "error", icon: "close-sharp" });
 			return;
 		}
-		dispatch(updateUserInfo({ email, fullName, userId: currentUser?.id! }));
+		dispatch(updateUserInfo({ email, fullName, id: currentUser?.id! }));
 		setEmail("");
 		setFullName("");
 		setTimeout(() => {
@@ -69,7 +69,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 						updateUserInfo({
 							email: "",
 							fullName: "",
-							userId: currentUser?.id!,
+							id: currentUser?.id!,
 						})
 					);
 				},
@@ -81,7 +81,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 		]);
 	};
 	return (
-		<View className='flex-1'>
+		<View className='flex-1 bg-white'>
 			<Animated.View
 				className='bg-black rounded-b-3quarter h-1/6 w-full justify-center px-5'
 				style={commonStyles.headerShadow}
@@ -210,7 +210,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 						</TouchableOpacity>
 						<View className='mt-10 mb-5'>
 							{Languages.map((lang, index) => (
-								<Animated.View entering={FadeInLeft.delay(300 * index + 1)}>
+								<Animated.View entering={FadeInLeft.delay(300 * index + 1)} key={index}>
 									<TouchableOpacity
 										key={index}
 										className={`py-1 w-full items-center justify-between bg-white px-1.5 flex-row`}

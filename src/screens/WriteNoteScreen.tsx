@@ -29,7 +29,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						isComplete: false,
 						remind_at: undefined,
 						text: note,
-						title: title.length ? title : "Untitled",
+						title: title.length ? title : t("untitled"),
 						categoryId: selectedCategoryId!,
 					})
 				);
@@ -45,7 +45,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						isComplete: route.params.note.isComplete,
 						remind_at: route.params.note.remind_at,
 						text: note,
-						title: title.length ? title : "Untitled",
+						title: title.length ? title : t("untitled"),
 						categoryId: selectedCategoryId!,
 						id: route.params.note.id,
 						updated_at: new Date(),
@@ -55,6 +55,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		}
 		navigation.goBack();
 	};
+
 	return (
 		<View className='flex-1 bg-white'>
 			<Animated.View
@@ -67,7 +68,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 					</TouchableOpacity>
 					<TextInput
 						className='bg-white px-3 font-bold py-1.5 rounded-full w-11/12'
-						placeholder='Title'
+						placeholder={t("title")}
 						style={{ fontSize: 20 }}
 						value={title}
 						onChangeText={setTitle}
@@ -95,7 +96,11 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 				</ScrollView> */}
 			</Animated.View>
 			<KeyboardAvoidingView className='flex-1 ' behavior='padding'>
-				<ScrollView contentContainerStyle={{ flex: 1, marginTop: 25 }} bounces={false} keyboardDismissMode='on-drag'>
+				<ScrollView
+					contentContainerStyle={{ flex: 1, marginTop: 25 }}
+					bounces={false}
+					keyboardDismissMode='interactive'
+					keyboardShouldPersistTaps='always'>
 					<TextInput
 						className='w-full flex-1 text-start px-1'
 						multiline
@@ -103,6 +108,11 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						onChangeText={setNote}
 						placeholder={t("notHere")}
 					/>
+					{note.length > 2 && (
+						<TouchableOpacity onPress={handleBack} className='absolute bottom-1 z-20 right-1 w-10 h-10 justify-center'>
+							<Ionicons name='checkmark-sharp' size={35} color={"green"} />
+						</TouchableOpacity>
+					)}
 					{/* <RichEditor
 						ref={richText}
 						scrollEnabled
