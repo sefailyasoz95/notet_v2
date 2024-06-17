@@ -49,9 +49,13 @@ export const uploadImageToSupabase = async (
 
 export const CreateUserService = async (body: UserType) => {
 	try {
-		let { data, error } = await supabase.from("users").insert(body);
+		let isExist = await supabase.from("users").select("*").filter("deviceId", "eq", body.deviceId).single();
+		let response;
+		if (isExist.data === null) {
+			response = await supabase.from("users").insert(body);
+		}
 		let currentUser = await supabase.from("users").select("*").filter("deviceId", "eq", body.deviceId).single();
-		if (!error) {
+		if (!response?.error) {
 			return {
 				data: {
 					currentUser: currentUser.data,
@@ -63,7 +67,7 @@ export const CreateUserService = async (body: UserType) => {
 			return {
 				data: undefined,
 				status: HttpStatusCode.BadRequest,
-				message: error.message,
+				message: response.error.message,
 			};
 		}
 	} catch (error) {
@@ -107,12 +111,14 @@ export const CreateCategoryService = async (body: CategoryType) => {
 export const GetCurrentUserService = async (deviceId: string) => {
 	try {
 		let currentUser = await supabase.from("users").select("*").filter("deviceId", "eq", deviceId).single();
+		if (currentUser.status === 406) {
+			currentUser = (await supabase.from("users").select("*").filter("deviceId", "eq", deviceId)).data![0];
+		}
 		let updatedUser: any = undefined;
 		const uniqueID = DeviceInfo.getUniqueIdSync();
 		if (uniqueID !== currentUser.data.deviceId) {
 			const country = RNLocalize.getCountry();
 			updatedUser = await supabase.from("users").update({ deviceId: uniqueID, country }).eq("id", currentUser.data.id);
-			await AsyncStorage.setItem("deviceId", uniqueID);
 		}
 		let savedNotes = await supabase
 			.from("notes")

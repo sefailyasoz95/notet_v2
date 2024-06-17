@@ -16,6 +16,7 @@ import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
 import useToast from "../hooks/useToast";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as StoreReview from "expo-store-review";
+import DeviceInfo from "react-native-device-info";
 
 type Props = NativeStackScreenProps<AppStackParams, "HomeScreen">;
 const HomeScreen = ({ navigation, route }: Props) => {
@@ -32,8 +33,8 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id);
 	const toggleModal = () => setRatingModal(!ratingModal);
 	const fetchUser = async () => {
-		const deviceId = await AsyncStorage.getItem("deviceId");
-		dispatch(getCurrentUser(deviceId!));
+		const deviceId = (await AsyncStorage.getItem("deviceId")) ?? DeviceInfo.getUniqueIdSync();
+		dispatch(getCurrentUser(deviceId));
 	};
 
 	useEffect(() => {
