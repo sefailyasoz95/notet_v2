@@ -3,12 +3,10 @@ import { initReactI18next } from "react-i18next";
 import en from "./assets/languages/en/translation.json";
 import tr from "./assets/languages/tr/translation.json";
 import de from "./assets/languages/de/translation.json";
-import * as Locale from "expo-localization";
-
-Locale.getLocales()[0].languageCode;
+import * as RNLocalize from "react-native-localize";
 
 i18n.use(initReactI18next).init({
-	lng: Locale.getLocales()[0].languageCode || "en",
+	lng: RNLocalize.getLocales()[0].languageCode || "en",
 	fallbackLng: "en",
 	debug: true,
 	defaultNS: "common",

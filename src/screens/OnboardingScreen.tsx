@@ -8,15 +8,14 @@ import { useAppDispatch } from "../redux/store";
 import { useTranslation } from "react-i18next";
 import Carousel from "react-native-reanimated-carousel";
 import { DEVICE_HEIGHT, DEVICE_WIDTH } from "../utils/constants";
-import Animated, { Easing, FadeInUp, SlideInDown, SlideInUp } from "react-native-reanimated";
+import Animated, { Easing, SlideInDown, SlideInUp } from "react-native-reanimated";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { createUser, getCurrentUser } from "../redux/actions";
-import * as Localize from "expo-localization";
+import { createUser } from "../redux/actions";
 import { setonboardingPassed } from "../redux/reducers";
-type Props = NativeStackScreenProps<AuthStackParams, "OnboardingScreen">;
 import DeviceInfo from "react-native-device-info";
 import * as RNLocalize from "react-native-localize";
 
+type Props = NativeStackScreenProps<AuthStackParams, "OnboardingScreen">;
 const OnboardingScreen = ({ navigation, route }: Props) => {
 	const { t } = useTranslation();
 	const dispatch = useAppDispatch();
@@ -30,7 +29,7 @@ const OnboardingScreen = ({ navigation, route }: Props) => {
 				email: "",
 				fullName: "",
 				isPremium: false,
-				deviceId: deviceId,
+				deviceId,
 			})
 		);
 		dispatch(setonboardingPassed(true));
