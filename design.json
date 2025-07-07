@@ -1,0 +1,113 @@
+{
+  "brand": {
+    "name": "NotEt",
+    "tagline": "Capture. Organize. Remember.",
+    "logo": {
+      "type": "Icon + Wordmark",
+      "style": "Rounded cube or stack of notes",
+      "colors": ["#4CAF50", "#FFFFFF"]
+    }
+  },
+  "theme": {
+    "mode": "Light (with Dark Mode support)",
+    "primary_color": "#4CAF50",
+    "background_color": "#FAFAFA",
+    "card_color": "#FFFFFF",
+    "accent_color": "#FF6F61",
+    "text": {
+      "primary": "#212121",
+      "secondary": "#757575",
+      "on_primary": "#FFFFFF"
+    },
+    "corner_radius": "16px",
+    "shadow": "Soft shadow (0 4px 12px rgba(0,0,0,0.1))"
+  },
+  "typography": {
+    "font_family": "Inter or SF Pro",
+    "header": {
+      "h1": "28px, bold",
+      "h2": "22px, semi-bold"
+    },
+    "body": {
+      "regular": "16px",
+      "small": "14px"
+    },
+    "button": "14px, medium"
+  },
+  "components": {
+    "app_bar": {
+      "background": "#4CAF50",
+      "text_color": "#FFFFFF",
+      "elements": [
+        "Greeting",
+        "Profile Avatar",
+        "Bell Icon (notifications optional)"
+      ]
+    },
+    "card": {
+      "type": "NoteCard",
+      "layout": "Horizontal",
+      "elements": ["Title", "Timestamp", "3-dot menu"],
+      "interaction": "Tap to open, hold for options",
+      "hover_effect": "Slight shadow grow"
+    },
+    "fab": {
+      "position": "Bottom Right",
+      "icon": "Plus",
+      "color": "#4CAF50",
+      "effect": "Elevated, shadowed"
+    },
+    "modals": {
+      "bottom_sheet": {
+        "radius": "20px",
+        "background": "#FFFFFF",
+        "text_color": "#212121",
+        "options": ["Set Reminder", "Delete"],
+        "icons": true
+      },
+      "language_picker": {
+        "type": "Dialog",
+        "style": "Radio list",
+        "highlight_color": "#4CAF50",
+        "cancel_icon": "Top Right, Red",
+        "font_size": "16px"
+      }
+    },
+    "note_editor": {
+      "fields": {
+        "title": {
+          "placeholder": "Note title",
+          "style": "Bold underline input"
+        },
+        "body": {
+          "placeholder": "Write something...",
+          "style": "Multi-line text input"
+        }
+      },
+      "keyboard_toolbar": ["Bold", "Italic", "Checklist", "Voice Input"]
+    },
+    "profile_page": {
+      "sections": [
+        "Privacy Policy",
+        "Terms of Use",
+        "Delete Account",
+        "Change Language"
+      ],
+      "footer": "App Version + Developer Tag"
+    }
+  },
+  "interactions": {
+    "transitions": "Slide for page navigation, fade-in for modals",
+    "feedback": "Tactile haptics (if supported), ripple effect on tap",
+    "state": {
+      "selection": "Checkmark icon with color fill",
+      "language": "Selected language highlighted and checkmarked"
+    }
+  },
+  "accessibility": {
+    "minimum_touch_target": "48x48px",
+    "text_scaling": "System font size respect",
+    "color_contrast_ratio": "AA+",
+    "language_support": ["en", "tr", "de"]
+  }
+}

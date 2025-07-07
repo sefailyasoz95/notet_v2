@@ -1,4 +1,11 @@
-import { KeyboardAvoidingView, ScrollView, StyleSheet, TextInput, TouchableOpacity, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  ScrollView,
+  StyleSheet,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import Animated, { Easing, SlideInUp } from "react-native-reanimated";
 import { commonStyles } from "../utils/commonStyles";
@@ -12,71 +19,83 @@ import { useTranslation } from "react-i18next";
 type Props = NativeStackScreenProps<AppStackParams, "WriteNoteScreen">;
 
 const WriteNoteScreen = ({ navigation, route }: Props) => {
-	const [title, setTitle] = useState(route.params?.note?.title ?? "");
-	const [note, setNote] = useState(route.params?.note?.text ?? "");
-	const { currentUser, categories } = useAppSelector((state) => state.global);
-	const dispatch = useAppDispatch();
-	const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
-	const { t } = useTranslation();
-	// const richText = createRef<RichEditor>();
-	// const handleHead = () => <Text style={{ color: "black" }}>H1</Text>;
-	const handleBack = () => {
-		if (!route.params.note) {
-			if (note)
-				dispatch(
-					saveNote({
-						userId: currentUser?.id!,
-						isComplete: false,
-						remind_at: undefined,
-						text: note,
-						title: title.length ? title : t("untitled"),
-						categoryId: selectedCategoryId!,
-					})
-				);
-		} else {
-			if (
-				route.params.note.title !== title ||
-				route.params.note.text !== note ||
-				route.params.note.categoryId !== selectedCategoryId
-			) {
-				dispatch(
-					updateNote({
-						userId: currentUser?.id!,
-						isComplete: route.params.note.isComplete,
-						remind_at: route.params.note.remind_at,
-						text: note,
-						title: title.length ? title : t("untitled"),
-						categoryId: selectedCategoryId!,
-						id: route.params.note.id,
-						updated_at: new Date(),
-					})
-				);
-			}
-		}
-		navigation.goBack();
-	};
+  const [title, setTitle] = useState(route.params?.note?.title ?? "");
+  const [note, setNote] = useState(route.params?.note?.text ?? "");
+  const { currentUser, categories } = useAppSelector((state) => state.global);
+  const dispatch = useAppDispatch();
+  const [selectedCategoryId, setSelectedCategoryId] = useState(
+    route.params.categoryId
+  );
+  const { t } = useTranslation();
+  // const richText = createRef<RichEditor>();
+  // const handleHead = () => <Text style={{ color: "black" }}>H1</Text>;
+  const handleBack = () => {
+    if (!route.params.note) {
+      if (note)
+        dispatch(
+          saveNote({
+            userId: currentUser?.id!,
+            isComplete: false,
+            remind_at: undefined,
+            text: note,
+            title: title.length ? title : t("untitled"),
+            categoryId: selectedCategoryId!,
+          })
+        );
+    } else {
+      if (
+        route.params.note.title !== title ||
+        route.params.note.text !== note ||
+        route.params.note.categoryId !== selectedCategoryId
+      ) {
+        dispatch(
+          updateNote({
+            userId: currentUser?.id!,
+            isComplete: route.params.note.isComplete,
+            remind_at: route.params.note.remind_at,
+            text: note,
+            title: title.length ? title : t("untitled"),
+            categoryId: selectedCategoryId!,
+            id: route.params.note.id,
+            updated_at: new Date(),
+          })
+        );
+      }
+    }
+    navigation.goBack();
+  };
 
-	return (
-		<View className='flex-1 bg-white'>
-			<Animated.View
-				className='bg-black rounded-b-3quarter flex-col justify-center items-center h-1/6 w-full pr-5 pl-2'
-				style={commonStyles.headerShadow}
-				entering={SlideInUp.duration(500).easing(Easing.elastic(0.1))}>
-				<View className='flex-row items-center justify-between mt-6'>
-					<TouchableOpacity onPress={handleBack}>
-						<Ionicons name='chevron-back' size={30} color={"white"} />
-					</TouchableOpacity>
-					<TextInput
-						className='bg-white px-3 font-bold py-1.5 rounded-full w-11/12'
-						placeholder={t("title")}
-						style={{ fontSize: 20 }}
-						value={title}
-						onChangeText={setTitle}
-						autoFocus
-					/>
-				</View>
-				{/* TODO: ENABLE CATEGORY ADD FEATURE IN THE NEXT RELEASE */}
-				{/* <ScrollView horizontal contentContainerStyle={styles.categories} className='self-center'>
+  return (
+    <View className="flex-1 bg-[#FAFAFA]">
+      <Animated.View
+        className="bg-[#4CAF50] rounded-b-3xl flex-col justify-center items-center h-1/6 w-full pr-5 pl-2"
+        style={[
+          commonStyles.headerShadow,
+          { shadowColor: "#4CAF50", shadowOpacity: 0.1, shadowRadius: 12 },
+        ]}
+        entering={SlideInUp.duration(500).easing(Easing.elastic(0.1))}
+      >
+        <View className="flex-row items-center justify-between mt-6">
+          <TouchableOpacity onPress={handleBack}>
+            <Ionicons name="chevron-back" size={30} color={"#FFFFFF"} />
+          </TouchableOpacity>
+          <TextInput
+            className="bg-white px-3 font-bold py-1.5 rounded-full w-11/12 border-b-2 border-[#4CAF50]"
+            placeholder={t("title")}
+            style={{
+              fontFamily: "Inter",
+              fontSize: 20,
+              fontWeight: "bold",
+              borderBottomWidth: 2,
+              borderBottomColor: "#4CAF50",
+            }}
+            value={title}
+            onChangeText={setTitle}
+            autoFocus
+          />
+        </View>
+        {/* TODO: ENABLE CATEGORY ADD FEATURE IN THE NEXT RELEASE */}
+        {/* <ScrollView horizontal contentContainerStyle={styles.categories} className='self-center'>
 					{categories.map((cat, index) => (
 						<Animated.View entering={FadeInLeft.delay(200 * (index + 1))} key={index}>
 							<TouchableOpacity
@@ -94,26 +113,43 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						</Animated.View>
 					))}
 				</ScrollView> */}
-			</Animated.View>
-			<KeyboardAvoidingView className='flex-1 ' behavior='padding'>
-				<ScrollView
-					contentContainerStyle={{ flex: 1, marginTop: 25 }}
-					bounces={false}
-					keyboardDismissMode='interactive'
-					keyboardShouldPersistTaps='always'>
-					<TextInput
-						className='w-full flex-1 text-start px-1'
-						multiline
-						value={note}
-						onChangeText={setNote}
-						placeholder={t("notHere")}
-					/>
-					{note.length > 2 && (
-						<TouchableOpacity onPress={handleBack} className='absolute bottom-1 z-20 right-1 w-10 h-10 justify-center'>
-							<Ionicons name='checkmark-sharp' size={35} color={"green"} />
-						</TouchableOpacity>
-					)}
-					{/* <RichEditor
+      </Animated.View>
+      <KeyboardAvoidingView className="flex-1 " behavior="padding">
+        <ScrollView
+          contentContainerStyle={{ flex: 1, marginTop: 25 }}
+          bounces={false}
+          keyboardDismissMode="interactive"
+          keyboardShouldPersistTaps="always"
+        >
+          <TextInput
+            className="w-full flex-1 text-start px-1"
+            multiline
+            value={note}
+            onChangeText={setNote}
+            placeholder={t("notHere")}
+            style={{
+              fontFamily: "Inter",
+              fontSize: 16,
+              color: "#212121",
+              minHeight: 120,
+            }}
+          />
+          {note.length > 2 && (
+            <TouchableOpacity
+              onPress={handleBack}
+              className="absolute bottom-1 z-20 right-1 w-12 h-12 justify-center items-center"
+              style={{
+                backgroundColor: "#4CAF50",
+                borderRadius: 24,
+                shadowColor: "#000",
+                shadowOpacity: 0.1,
+                shadowRadius: 12,
+              }}
+            >
+              <Ionicons name="checkmark-sharp" size={35} color={"#FFFFFF"} />
+            </TouchableOpacity>
+          )}
+          {/* <RichEditor
 						ref={richText}
 						scrollEnabled
 						onChange={(descriptionText) => {
@@ -126,19 +162,19 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						actions={[actions.setBold, actions.setItalic, actions.setUnderline, actions.heading1]}
 						iconMap={{ [actions.heading1]: handleHead }}
 					/> */}
-				</ScrollView>
-			</KeyboardAvoidingView>
-		</View>
-	);
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </View>
+  );
 };
 
 export default WriteNoteScreen;
 
 const styles = StyleSheet.create({
-	categories: {
-		height: 25,
-		alignItems: "center",
-		width: "80%",
-		alignSelf: "center",
-	},
+  categories: {
+    height: 25,
+    alignItems: "center",
+    width: "80%",
+    alignSelf: "center",
+  },
 });
