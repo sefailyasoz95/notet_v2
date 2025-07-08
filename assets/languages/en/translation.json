@@ -1,12 +1,16 @@
 {
 	"hello": "Hello",
+	"appSubtitle": "Your Digital Notebook",
 	"onboarding": {
-		"firstTitle": "To-Do List",
-		"firstDescription": "Make it either daily or weekly",
-		"secondTitle": "Set a Reminder",
-		"secondDescription": "Don't forget anything!"
+		"firstTitle": "Create & Organize Notes",
+		"firstDescription": "Write, edit, and organize your thoughts with our intuitive note-taking interface",
+		"secondTitle": "Never Miss a Thing",
+		"secondDescription": "Set reminders and stay on top of your important tasks and deadlines",
+		"thirdTitle": "Premium Features",
+		"thirdDescription": "Audio notes, photo attachments, and secure sharing for enhanced productivity"
 	},
-	"getStarted": "Let's Get Started!",
+	"getStarted": "Get Started",
+	"swipeToExplore": "Swipe to explore features",
 	"token": "Tokens",
 	"buy10": "Buy 10 Tokens",
 	"buy50": "Buy 50 Tokens",
@@ -67,5 +71,31 @@
 	"untitled": "Untitled",
 	"ratingSentence": "How satisfied are you with NotEt? Rate us!",
 	"notNow": "Not now",
-	"thanksForRating": "Your rating has been taken, thanks!"
+	"thanksForRating": "Your rating has been taken, thanks!",
+	"paywall": {
+		"title": "Premium NotEt",
+		"subtitle": "Unlock all features and boost your productivity",
+		"featuresTitle": "Premium Features",
+		"features": {
+			"audioNotes": "Audio Notes",
+			"audioNotesDesc": "Record and save voice memos with your notes",
+			"photoAttachments": "Photo Attachments",
+			"photoAttachmentsDesc": "Add images and photos to your notes",
+			"secureSharing": "Secure Sharing",
+			"secureSharingDesc": "Share notes safely with password protection",
+			"cloudSync": "Cloud Sync",
+			"cloudSyncDesc": "Access your notes from any device"
+		},
+		"plansTitle": "Choose Your Plan",
+		"weeklyTitle": "Weekly Plan",
+		"weeklyPeriod": "per week",
+		"monthlyTitle": "Monthly Plan",
+		"monthlyPeriod": "per month",
+		"monthlySavings": "Save 58% compared to weekly",
+		"popular": "POPULAR",
+		"subscribe": "Subscribe for",
+		"restore": "Restore Purchases",
+		"terms": "Terms & Privacy",
+		"free": "Continue Free"
+	}
 }

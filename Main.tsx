@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from "./src/redux/store";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { setonboardingPassed } from "./src/redux/reducers";
+import { setOnboardingPassed } from "./src/redux/reducers";
 import AppStack from "./src/stacks/AppStack";
 import AuthStack from "./src/stacks/AuthStack";
 import i18next from "i18next";
@@ -25,7 +25,7 @@ const Main = () => {
 			if (appLang !== null) {
 				i18next.changeLanguage(appLang);
 			}
-			dispatch(setonboardingPassed(true));
+			dispatch(setOnboardingPassed(true));
 		}
 	};
 

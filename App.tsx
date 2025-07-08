@@ -7,11 +7,10 @@ import ToastComponent, { ToastProps } from "./src/components/ToastComponent";
 import Main from "./Main";
 import store from "./src/redux/store";
 import "moment/min/moment-with-locales";
-import { StatusBar } from "expo-status-bar";
 import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { registerForPushNotificationsAsync } from "./src/utils/notifications";
-import { Platform } from "react-native";
+import { Platform, StatusBar } from "react-native";
 
 const toastConfig = {
 	customToast: ({ props }: { props: ToastProps }) => (
@@ -52,7 +51,7 @@ export default function App() {
 	}, []);
 	return (
 		<Provider store={store}>
-			<StatusBar style='light' />
+			<StatusBar />
 			<Main />
 			<Toast config={toastConfig} />
 		</Provider>

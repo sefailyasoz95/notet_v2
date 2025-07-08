@@ -1,12 +1,16 @@
 {
 	"hello": "Merhaba",
+	"appSubtitle": "Dijital Not Defteriniz",
 	"onboarding": {
-		"firstTitle": "Yapılacaklar Listesi",
-		"firstDescription": "Günlük ya da haftalık olarak hazırla",
-		"secondTitle": "Hatırlatıcını Kur",
-		"secondDescription": "Hiç bir şeyi unutma!"
+		"firstTitle": "Not Oluştur & Düzenle",
+		"firstDescription": "Sezgisel not alma arayüzümüzle düşüncelerinizi yazın, düzenleyin ve organize edin",
+		"secondTitle": "Hiçbir Şeyi Kaçırma",
+		"secondDescription": "Hatırlatıcılar ayarlayın ve önemli görevlerinizi ve son tarihlerinizi takip edin",
+		"thirdTitle": "Premium Özellikler",
+		"thirdDescription": "Gelişmiş verimlilik için ses notları, fotoğraf ekleri ve güvenli paylaşım"
 	},
-	"getStarted": "Hadi Başlayalım!",
+	"getStarted": "Başlayın",
+	"swipeToExplore": "Özellikleri keşfetmek için kaydırın",
 	"token": "Tokenlar",
 	"buy10": "10 Token Satın Al",
 	"buy50": "50 Token Satın Al",
@@ -67,5 +71,31 @@
 	"untitled": "Başlıksız",
 	"ratingSentence": "NotEt'ten ne kadar memnunsunuz ? Bizi puanlayın!",
 	"notNow": "Şimdi değil",
-	"thanksForRating": "Derecelendirmeniz kaydedildi, teşekkürler!"
+	"thanksForRating": "Derecelendirmeniz kaydedildi, teşekkürler!",
+	"paywall": {
+		"title": "Premium NotEt",
+		"subtitle": "Tüm özelliklerin kilidini açın ve verimliliğinizi artırın",
+		"featuresTitle": "Premium Özellikler",
+		"features": {
+			"audioNotes": "Ses Notları",
+			"audioNotesDesc": "Notlarınızla birlikte ses kayıtları yapın ve saklayın",
+			"photoAttachments": "Fotoğraf Ekleri",
+			"photoAttachmentsDesc": "Notlarınıza resim ve fotoğraflar ekleyin",
+			"secureSharing": "Güvenli Paylaşım",
+			"secureSharingDesc": "Notlarınızı şifre korumasıyla güvenle paylaşın",
+			"cloudSync": "Bulut Senkronizasyonu",
+			"cloudSyncDesc": "Notlarınıza herhangi bir cihazdan erişin"
+		},
+		"plansTitle": "Planınızı Seçin",
+		"weeklyTitle": "Haftalık Plan",
+		"weeklyPeriod": "hafta başına",
+		"monthlyTitle": "Aylık Plan",
+		"monthlyPeriod": "ay başına",
+		"monthlySavings": "Haftalık plana göre %58 tasarruf",
+		"popular": "POPÜLER",
+		"subscribe": "Abone ol -",
+		"restore": "Satın Alımları Geri Yükle",
+		"terms": "Şartlar ve Gizlilik",
+		"free": "Ücretsiz Kullan"
+	}
 }

@@ -30,7 +30,7 @@ export const reducer = createSlice({
 	name: "global",
 	initialState,
 	reducers: {
-		setonboardingPassed: (state, action) => {
+		setOnboardingPassed: (state, action) => {
 			state.onboardingPassed = action.payload;
 		},
 	},
@@ -160,6 +160,6 @@ export const reducer = createSlice({
 	},
 });
 
-export const { setonboardingPassed } = reducer.actions;
+export const { setOnboardingPassed } = reducer.actions;
 
 export default reducer.reducer;

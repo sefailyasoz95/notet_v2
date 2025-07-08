@@ -1,12 +1,16 @@
 {
 	"hello": "Hallo",
+	"appSubtitle": "Ihr digitales Notizbuch",
 	"onboarding": {
-		"firstTitle": "To-Do-Liste",
-		"firstDescription": "Machen Sie es täglich oder wöchentlich",
-		"secondTitle": "Eine Erinnerung setzen",
-		"secondDescription": "Vergiss nichts!"
+		"firstTitle": "Notizen erstellen & organisieren",
+		"firstDescription": "Schreiben, bearbeiten und organisieren Sie Ihre Gedanken mit unserer intuitiven Notiz-Oberfläche",
+		"secondTitle": "Verpassen Sie nichts",
+		"secondDescription": "Setzen Sie Erinnerungen und behalten Sie Ihre wichtigen Aufgaben und Termine im Blick",
+		"thirdTitle": "Premium-Funktionen",
+		"thirdDescription": "Audio-Notizen, Foto-Anhänge und sicheres Teilen für erhöhte Produktivität"
 	},
-	"getStarted": "Lass uns anfangen!",
+	"getStarted": "Loslegen",
+	"swipeToExplore": "Wischen Sie, um Funktionen zu erkunden",
 	"token": "Token",
 	"buy10": "10 Token kaufen",
 	"buy50": "50 Token kaufen",
@@ -67,5 +71,31 @@
 	"untitled": "Ohne Titel",
 	"ratingSentence": "Wie zufrieden sind Sie mit NotEt? Bewerten Sie uns!",
 	"notNow": "Nicht jetzt",
-	"thanksForRating": "Ihre Bewertung wurde übernommen, danke!"
+	"thanksForRating": "Ihre Bewertung wurde übernommen, danke!",
+	"paywall": {
+		"title": "Premium NotEt",
+		"subtitle": "Schalten Sie alle Funktionen frei und steigern Sie Ihre Produktivität",
+		"featuresTitle": "Premium-Funktionen",
+		"features": {
+			"audioNotes": "Audio-Notizen",
+			"audioNotesDesc": "Sprachmemos mit Ihren Notizen aufnehmen und speichern",
+			"photoAttachments": "Foto-Anhänge",
+			"photoAttachmentsDesc": "Bilder und Fotos zu Ihren Notizen hinzufügen",
+			"secureSharing": "Sicheres Teilen",
+			"secureSharingDesc": "Notizen sicher mit Passwort-Schutz teilen",
+			"cloudSync": "Cloud-Synchronisation",
+			"cloudSyncDesc": "Greifen Sie von jedem Gerät auf Ihre Notizen zu"
+		},
+		"plansTitle": "Wählen Sie Ihren Plan",
+		"weeklyTitle": "Wöchentlicher Plan",
+		"weeklyPeriod": "pro Woche",
+		"monthlyTitle": "Monatlicher Plan",
+		"monthlyPeriod": "pro Monat",
+		"monthlySavings": "Sparen Sie 58% im Vergleich zum wöchentlichen Plan",
+		"popular": "BELIEBT",
+		"subscribe": "Abonnieren für",
+		"restore": "Käufe Wiederherstellen",
+		"terms": "Bedingungen & Datenschutz",
+		"free": "Kostenlos fortfahren"
+	}
 }

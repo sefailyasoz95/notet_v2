@@ -1,10 +1,9 @@
 import React, { useMemo } from "react";
-import { Text, View } from "react-native";
+import { Text } from "react-native";
 import { BlurView } from "expo-blur";
 import { useTranslation } from "react-i18next";
 import { DEVICE_WIDTH } from "../utils/constants";
 import { Ionicons } from "@expo/vector-icons";
-// import { BlurView } from "expo-blur";
 
 export type ToastProps = {
 	message: string;
@@ -23,7 +22,6 @@ function ToastComponent({ message, icon, type }: ToastProps) {
 				borderColor: color,
 			}}
 			className={`flex-row items-center border-2 w-11/12 mt-5 px-3 gap-x-2 py-2.5 rounded-full bg-opacity-50`}>
-			{/* <View className={`flex-row items-center bg-gray-500 w-10/12 mt-5 px-3 py-1 rounded-full`}> */}
 			<Ionicons name={icon} size={25} color={color} />
 			<Text
 				className={`font-bold text-white`}
@@ -35,7 +33,6 @@ function ToastComponent({ message, icon, type }: ToastProps) {
 				}}>
 				{t(message)}
 			</Text>
-			{/* </View> */}
 		</BlurView>
 	);
 }

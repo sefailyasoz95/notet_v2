@@ -15,6 +15,7 @@ export type InitialState = {
 
 export type AuthStackParams = {
 	OnboardingScreen: undefined;
+	PaywallScreen: undefined;
 };
 export type TabStackParams = {
 	Camera: undefined;
