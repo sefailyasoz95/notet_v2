@@ -1,13 +1,26 @@
 import {
-  KeyboardAvoidingView,
-  ScrollView,
-  StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  View,
+	KeyboardAvoidingView,
+	ScrollView,
+	StyleSheet,
+	TextInput,
+	TouchableOpacity,
+	View,
+	Text,
+	Platform,
 } from "react-native";
-import React, { useState } from "react";
-import Animated, { Easing, SlideInUp } from "react-native-reanimated";
+import React, { createRef, useState, useEffect } from "react";
+import Animated, {
+	Easing,
+	SlideInUp,
+	SlideInDown,
+	FadeIn,
+	FadeInLeft,
+	SlideInRight,
+	useAnimatedStyle,
+	useSharedValue,
+	withSpring,
+	withTiming,
+} from "react-native-reanimated";
 import { commonStyles } from "../utils/commonStyles";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";
@@ -15,166 +28,347 @@ import { Ionicons } from "@expo/vector-icons";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { saveNote, updateNote } from "../redux/actions";
 import { useTranslation } from "react-i18next";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { RichEditor, RichToolbar, actions } from "react-native-pell-rich-editor";
 
 type Props = NativeStackScreenProps<AppStackParams, "WriteNoteScreen">;
 
 const WriteNoteScreen = ({ navigation, route }: Props) => {
-  const [title, setTitle] = useState(route.params?.note?.title ?? "");
-  const [note, setNote] = useState(route.params?.note?.text ?? "");
-  const { currentUser, categories } = useAppSelector((state) => state.global);
-  const dispatch = useAppDispatch();
-  const [selectedCategoryId, setSelectedCategoryId] = useState(
-    route.params.categoryId
-  );
-  const { t } = useTranslation();
-  // const richText = createRef<RichEditor>();
-  // const handleHead = () => <Text style={{ color: "black" }}>H1</Text>;
-  const handleBack = () => {
-    if (!route.params.note) {
-      if (note)
-        dispatch(
-          saveNote({
-            userId: currentUser?.id!,
-            isComplete: false,
-            remind_at: undefined,
-            text: note,
-            title: title.length ? title : t("untitled"),
-            categoryId: selectedCategoryId!,
-          })
-        );
-    } else {
-      if (
-        route.params.note.title !== title ||
-        route.params.note.text !== note ||
-        route.params.note.categoryId !== selectedCategoryId
-      ) {
-        dispatch(
-          updateNote({
-            userId: currentUser?.id!,
-            isComplete: route.params.note.isComplete,
-            remind_at: route.params.note.remind_at,
-            text: note,
-            title: title.length ? title : t("untitled"),
-            categoryId: selectedCategoryId!,
-            id: route.params.note.id,
-            updated_at: new Date(),
-          })
-        );
-      }
-    }
-    navigation.goBack();
-  };
+	const [title, setTitle] = useState(route.params?.note?.title ?? "");
+	const [note, setNote] = useState(route.params?.note?.text ?? "");
+	const [showRichToolbar, setShowRichToolbar] = useState(false);
+	const [isEditorReady, setIsEditorReady] = useState(false);
+	const { currentUser, categories } = useAppSelector((state) => state.global);
+	const dispatch = useAppDispatch();
+	const insets = useSafeAreaInsets();
+	const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
+	const { t } = useTranslation();
+	const richText = createRef<RichEditor>();
 
-  return (
-    <View className="flex-1 bg-[#FAFAFA]">
-      <Animated.View
-        className="bg-[#4CAF50] rounded-b-3xl flex-col justify-center items-center h-1/6 w-full pr-5 pl-2"
-        style={[
-          commonStyles.headerShadow,
-          { shadowColor: "#4CAF50", shadowOpacity: 0.1, shadowRadius: 12 },
-        ]}
-        entering={SlideInUp.duration(500).easing(Easing.elastic(0.1))}
-      >
-        <View className="flex-row items-center justify-between mt-6">
-          <TouchableOpacity onPress={handleBack}>
-            <Ionicons name="chevron-back" size={30} color={"#FFFFFF"} />
-          </TouchableOpacity>
-          <TextInput
-            className="bg-white px-3 font-bold py-1.5 rounded-full w-11/12 border-b-2 border-[#4CAF50]"
-            placeholder={t("title")}
-            style={{
-              fontFamily: "Inter",
-              fontSize: 20,
-              fontWeight: "bold",
-              borderBottomWidth: 2,
-              borderBottomColor: "#4CAF50",
-            }}
-            value={title}
-            onChangeText={setTitle}
-            autoFocus
-          />
-        </View>
-        {/* TODO: ENABLE CATEGORY ADD FEATURE IN THE NEXT RELEASE */}
-        {/* <ScrollView horizontal contentContainerStyle={styles.categories} className='self-center'>
-					{categories.map((cat, index) => (
-						<Animated.View entering={FadeInLeft.delay(200 * (index + 1))} key={index}>
-							<TouchableOpacity
-								className={`
-							border-2 rounded-xl px-1 justify-center mx-1
-							${selectedCategoryId === cat.id ? "border-green-700" : "border-white"}
-							`}>
-								<Text
-									className={`${
-										selectedCategoryId === cat.id ? "text-green-700" : "text-white"
-									} font-bold p-1 self-center -mt-0.5`}>
-									{t(cat.name)}
-								</Text>
-							</TouchableOpacity>
-						</Animated.View>
-					))}
-				</ScrollView> */}
-      </Animated.View>
-      <KeyboardAvoidingView className="flex-1 " behavior="padding">
-        <ScrollView
-          contentContainerStyle={{ flex: 1, marginTop: 25 }}
-          bounces={false}
-          keyboardDismissMode="interactive"
-          keyboardShouldPersistTaps="always"
-        >
-          <TextInput
-            className="w-full flex-1 text-start px-1"
-            multiline
-            value={note}
-            onChangeText={setNote}
-            placeholder={t("notHere")}
-            style={{
-              fontFamily: "Inter",
-              fontSize: 16,
-              color: "#212121",
-              minHeight: 120,
-            }}
-          />
-          {note.length > 2 && (
-            <TouchableOpacity
-              onPress={handleBack}
-              className="absolute bottom-1 z-20 right-1 w-12 h-12 justify-center items-center"
-              style={{
-                backgroundColor: "#4CAF50",
-                borderRadius: 24,
-                shadowColor: "#000",
-                shadowOpacity: 0.1,
-                shadowRadius: 12,
-              }}
-            >
-              <Ionicons name="checkmark-sharp" size={35} color={"#FFFFFF"} />
-            </TouchableOpacity>
-          )}
-          {/* <RichEditor
-						ref={richText}
-						scrollEnabled
-						onChange={(descriptionText) => {
-							console.log("descriptionText:", descriptionText);
+	// Animation values
+	const toolbarHeight = useSharedValue(0);
+	const saveButtonScale = useSharedValue(0);
+	const headerScale = useSharedValue(0);
+
+	useEffect(() => {
+		// Animate header on mount
+		headerScale.value = withSpring(1, {
+			damping: 15,
+			stiffness: 100,
+		});
+
+		// Show save button if there's content
+		if (note.length > 2 || title.length > 0) {
+			saveButtonScale.value = withSpring(1, {
+				damping: 15,
+				stiffness: 100,
+			});
+		}
+
+		// Initialize rich editor with existing content after a small delay
+		setTimeout(() => {
+			if (richText.current && note) {
+				richText.current.setContentHTML(note);
+			}
+		}, 100);
+	}, []);
+
+	useEffect(() => {
+		// Animate save button based on content
+		if (note.length > 2 || title.length > 0) {
+			saveButtonScale.value = withSpring(1, {
+				damping: 15,
+				stiffness: 100,
+			});
+		} else {
+			saveButtonScale.value = withSpring(0, {
+				damping: 15,
+				stiffness: 100,
+			});
+		}
+	}, [note, title]);
+
+	const handleBack = () => {
+		if (!route.params.note) {
+			if (note || title)
+				dispatch(
+					saveNote({
+						userId: currentUser?.id!,
+						isComplete: false,
+						remind_at: undefined,
+						text: note,
+						title: title.length ? title : t("untitled"),
+						categoryId: selectedCategoryId!,
+					})
+				);
+		} else {
+			if (
+				route.params.note.title !== title ||
+				route.params.note.text !== note ||
+				route.params.note.categoryId !== selectedCategoryId
+			) {
+				dispatch(
+					updateNote({
+						userId: currentUser?.id!,
+						isComplete: route.params.note.isComplete,
+						remind_at: route.params.note.remind_at,
+						text: note,
+						title: title.length ? title : t("untitled"),
+						categoryId: selectedCategoryId!,
+						id: route.params.note.id,
+						updated_at: new Date(),
+					})
+				);
+			}
+		}
+		navigation.goBack();
+	};
+
+	const toggleRichToolbar = () => {
+		setShowRichToolbar(!showRichToolbar);
+		toolbarHeight.value = withTiming(showRichToolbar ? 0 : 50, {
+			duration: 300,
+			easing: Easing.out(Easing.cubic),
+		});
+	};
+
+	const handleEditorReady = () => {
+		setIsEditorReady(true);
+		// Set content after editor is ready
+		if (richText.current && note) {
+			richText.current.setContentHTML(note);
+		}
+	};
+
+	const handleEditorChange = (text: string) => {
+		setNote(text);
+	};
+
+	const handleCategorySelect = (categoryId: number) => {
+		setSelectedCategoryId(categoryId);
+	};
+
+	// Animation styles
+	const headerAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ scale: headerScale.value }],
+		};
+	});
+
+	const saveButtonAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			transform: [{ scale: saveButtonScale.value }],
+		};
+	});
+
+	const toolbarAnimatedStyle = useAnimatedStyle(() => {
+		return {
+			height: toolbarHeight.value,
+			opacity: toolbarHeight.value / 50,
+		};
+	});
+
+	const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId);
+
+	return (
+		<SafeAreaView className='flex-1 bg-gray-50 dark:bg-gray-900' edges={["left", "right"]}>
+			{/* Animated Header */}
+			<Animated.View
+				className='bg-black dark:bg-white rounded-b-3xl px-6 pb-6'
+				style={[styles.headerShadow, headerAnimatedStyle, { paddingTop: insets.top + 20 }]}
+				entering={SlideInUp.duration(600).easing(Easing.out(Easing.cubic))}>
+				<View className='flex-row items-center justify-between mb-6'>
+					<TouchableOpacity
+						onPress={handleBack}
+						className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+						<Ionicons name='chevron-back' size={24} color={"white"} />
+					</TouchableOpacity>
+
+					<View className='flex-1 mx-4'>
+						<Text className='text-white dark:text-black font-bold text-lg text-center'>
+							{route.params.note ? t("editNote") : t("newNote")}
+						</Text>
+						{selectedCategory && (
+							<Text className='text-white/70 dark:text-black/70 text-sm text-center'>{t(selectedCategory.name)}</Text>
+						)}
+					</View>
+
+					<TouchableOpacity
+						onPress={toggleRichToolbar}
+						className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+						<Ionicons name={showRichToolbar ? "close" : "text"} size={20} color={"white"} />
+					</TouchableOpacity>
+				</View>
+
+				{/* Title Input */}
+				<Animated.View
+					className='bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4'
+					entering={FadeInLeft.delay(200).duration(600)}>
+					<TextInput
+						className='text-black dark:text-white font-bold text-xl'
+						placeholder={t("title")}
+						placeholderTextColor='#9CA3AF'
+						value={title}
+						onChangeText={setTitle}
+						style={{
+							fontFamily: "Inter",
+							fontSize: 20,
+							fontWeight: "bold",
 						}}
-						className='flex-1'
 					/>
-					<RichToolbar
-						editor={richText}
-						actions={[actions.setBold, actions.setItalic, actions.setUnderline, actions.heading1]}
-						iconMap={{ [actions.heading1]: handleHead }}
-					/> */}
-        </ScrollView>
-      </KeyboardAvoidingView>
-    </View>
-  );
+				</Animated.View>
+
+				{/* Category Selection */}
+				<Animated.View entering={FadeInLeft.delay(400).duration(600)} className='mb-4'>
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						contentContainerStyle={{ paddingHorizontal: 4 }}>
+						{categories.map((cat, index) => (
+							<Animated.View entering={FadeInLeft.delay(200 * (index + 1)).duration(600)} key={cat.id} className='mr-3'>
+								<TouchableOpacity
+									onPress={() => handleCategorySelect(cat.id!)}
+									className={`px-4 py-2 rounded-full border-2 ${
+										selectedCategoryId === cat.id
+											? "border-blue-500 bg-blue-500/20"
+											: "border-white/30 dark:border-gray-600"
+									}`}>
+									<Text
+										className={`font-semibold ${
+											selectedCategoryId === cat.id ? "text-blue-400" : "text-white dark:text-gray-300"
+										}`}>
+										{t(cat.name)}
+									</Text>
+								</TouchableOpacity>
+							</Animated.View>
+						))}
+					</ScrollView>
+				</Animated.View>
+			</Animated.View>
+
+			{/* Rich Text Toolbar */}
+			<Animated.View
+				style={[toolbarAnimatedStyle, { overflow: "hidden" }]}
+				className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
+				<RichToolbar
+					editor={richText}
+					actions={[
+						actions.setBold,
+						actions.setItalic,
+						actions.setUnderline,
+						actions.heading1,
+						actions.heading2,
+						actions.insertBulletsList,
+						actions.insertOrderedList,
+						actions.insertLink,
+					]}
+					iconTint='#9CA3AF'
+					selectedIconTint='#3B82F6'
+					style={{
+						backgroundColor: "transparent",
+						height: 50,
+						borderTopWidth: 0,
+						borderBottomWidth: 0,
+					}}
+					flatContainerStyle={{
+						paddingHorizontal: 12,
+					}}
+				/>
+			</Animated.View>
+
+			{/* Content Area */}
+			<KeyboardAvoidingView
+				className='flex-1'
+				behavior={Platform.OS === "ios" ? "padding" : "height"}
+				keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}>
+				<Animated.View className='flex-1 m-4' entering={FadeIn.delay(600).duration(600)}>
+					<View className='bg-white dark:bg-gray-800 rounded-2xl flex-1 p-4' style={styles.contentShadow}>
+						<RichEditor
+							ref={richText}
+							initialContentHTML=''
+							onChange={handleEditorChange}
+							editorInitializedCallback={handleEditorReady}
+							placeholder={t("notHere")}
+							style={{
+								backgroundColor: "transparent",
+								minHeight: 200,
+								flex: 1,
+							}}
+							useContainer={true}
+							initialHeight={200}
+							editorStyle={{
+								backgroundColor: "transparent",
+								color: "#212121",
+								placeholderColor: "#9CA3AF",
+								contentCSSText: `
+                  * { 
+                    font-size: 16px !important; 
+                    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
+                    line-height: 1.5 !important;
+                  }
+                  p { 
+                    margin: 0 0 8px 0 !important; 
+                  }
+                  h1, h2, h3, h4, h5, h6 { 
+                    margin: 12px 0 8px 0 !important; 
+                  }
+                  ul, ol { 
+                    margin: 8px 0 !important; 
+                    padding-left: 20px !important; 
+                  }
+                `,
+							}}
+						/>
+					</View>
+				</Animated.View>
+			</KeyboardAvoidingView>
+
+			{/* Floating Save Button */}
+			<Animated.View className='absolute right-6 bottom-8' style={[saveButtonAnimatedStyle]}>
+				<TouchableOpacity
+					onPress={handleBack}
+					className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center'
+					style={[styles.fabShadow]}
+					activeOpacity={0.8}>
+					<Ionicons name='checkmark-sharp' size={28} color={"white"} />
+				</TouchableOpacity>
+			</Animated.View>
+		</SafeAreaView>
+	);
 };
 
 export default WriteNoteScreen;
 
 const styles = StyleSheet.create({
-  categories: {
-    height: 25,
-    alignItems: "center",
-    width: "80%",
-    alignSelf: "center",
-  },
+	headerShadow: {
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 8,
+		},
+		shadowOpacity: 0.15,
+		shadowRadius: 20,
+		elevation: 10,
+	},
+	contentShadow: {
+		shadowColor: "#000",
+		shadowOffset: {
+			width: 0,
+			height: 4,
+		},
+		shadowOpacity: 0.1,
+		shadowRadius: 12,
+		elevation: 8,
+	},
+	fabShadow: {
+		shadowColor: "#3B82F6",
+		shadowOffset: {
+			width: 0,
+			height: 8,
+		},
+		shadowOpacity: 0.3,
+		shadowRadius: 16,
+		elevation: 12,
+	},
 });

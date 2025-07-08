@@ -9,6 +9,8 @@
 		"thirdTitle": "Premium Özellikler",
 		"thirdDescription": "Gelişmiş verimlilik için ses notları, fotoğraf ekleri ve güvenli paylaşım"
 	},
+	"editNote": "Notu Düzenle",
+	"newNote": "Yeni Not",
 	"getStarted": "Başlayın",
 	"swipeToExplore": "Özellikleri keşfetmek için kaydırın",
 	"token": "Tokenlar",
@@ -97,5 +99,21 @@
 		"restore": "Satın Alımları Geri Yükle",
 		"terms": "Şartlar ve Gizlilik",
 		"free": "Ücretsiz Kullan"
+	},
+	"home": {
+		"welcome": "Tekrar hoş geldiniz",
+		"totalNotes": "Toplam Not",
+		"categories": "Kategoriler",
+		"premium": "PRO",
+		"free": "ÜCRETSİZ",
+		"plan": "Plan",
+		"noNotesTitle": "Henüz not yok",
+		"noNotesDescription": "Aşağıdaki artı butonuna dokunarak ilk notunuzu yazmaya başlayın",
+		"rating": {
+			"title": "NotEt'i Değerlendirin",
+			"description": "Uygulamamızla ilgili deneyiminizi nasıl değerlendirirsiniz?",
+			"notNow": "Şimdi Değil"
+		},
+		"notes": "Notlar"
 	}
 }

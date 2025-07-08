@@ -97,5 +97,24 @@
 		"restore": "Käufe Wiederherstellen",
 		"terms": "Bedingungen & Datenschutz",
 		"free": "Kostenlos fortfahren"
-	}
+	},
+	"home": {
+		"welcome": "Willkommen zurück",
+		"totalNotes": "Gesamte Notizen",
+		"categories": "Kategorien",
+		"premium": "PRO",
+		"free": "KOSTENLOS",
+		"plan": "Plan",
+		"noNotesTitle": "Noch keine Notizen",
+		"noNotesDescription": "Beginnen Sie mit Ihrer ersten Notiz, indem Sie auf die Plus-Schaltfläche unten tippen",
+		"rating": {
+			"title": "NotEt bewerten",
+			"description": "Wie würden Sie Ihre Erfahrung mit unserer App bewerten?",
+			"notNow": "Nicht jetzt"
+		},
+		"notes": "Notizen"
+	},
+
+	"editNote": "Notiz bearbeiten",
+	"newNote": "Neue Notiz"
 }

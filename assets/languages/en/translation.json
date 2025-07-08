@@ -97,5 +97,24 @@
 		"restore": "Restore Purchases",
 		"terms": "Terms & Privacy",
 		"free": "Continue Free"
-	}
+	},
+	"home": {
+		"welcome": "Welcome back",
+		"totalNotes": "Total Notes",
+		"categories": "Categories",
+		"premium": "PRO",
+		"free": "FREE",
+		"plan": "Plan",
+		"noNotesTitle": "No notes yet",
+		"noNotesDescription": "Start writing your first note by tapping the plus button below",
+		"rating": {
+			"title": "Rate NotEt",
+			"description": "How would you rate your experience with our app?",
+			"notNow": "Not Now"
+		},
+
+		"notes": "Notes"
+	},
+	"editNote": "Edit Note",
+	"newNote": "New Note"
 }
