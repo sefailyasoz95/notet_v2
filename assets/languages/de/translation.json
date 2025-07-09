@@ -116,5 +116,21 @@
 	},
 
 	"editNote": "Notiz bearbeiten",
-	"newNote": "Neue Notiz"
+	"newNote": "Neue Notiz",
+	"network": {
+		"noConnection": {
+			"title": "Keine Internetverbindung",
+			"description": "Bitte überprüfen Sie Ihre Internetverbindung und versuchen Sie es erneut. Stellen Sie sicher, dass Sie mit einem stabilen Netzwerk verbunden sind."
+		},
+		"status": {
+			"offline": "Offline"
+		},
+		"actions": {
+			"retry": "Erneut versuchen",
+			"settings": "Einstellungen öffnen"
+		},
+		"help": {
+			"text": "Dieses Fenster schließt sich automatisch, wenn die Verbindung wiederhergestellt ist"
+		}
+	}
 }

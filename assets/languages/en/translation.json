@@ -116,5 +116,21 @@
 		"notes": "Notes"
 	},
 	"editNote": "Edit Note",
-	"newNote": "New Note"
+	"newNote": "New Note",
+	"network": {
+		"noConnection": {
+			"title": "No Internet Connection",
+			"description": "Please check your internet connection and try again."
+		},
+		"status": {
+			"offline": "Offline"
+		},
+		"actions": {
+			"retry": "Try Again",
+			"settings": "Open Settings"
+		},
+		"help": {
+			"text": "This modal will automatically close when connection is restored"
+		}
+	}
 }

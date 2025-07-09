@@ -115,5 +115,21 @@
 			"notNow": "Şimdi Değil"
 		},
 		"notes": "Notlar"
+	},
+	"network": {
+		"noConnection": {
+			"title": "İnternet Bağlantısı Yok",
+			"description": "Lütfen internet bağlantınızı kontrol edin ve tekrar deneyin. Kararlı bir ağa bağlı olduğunuzdan emin olun."
+		},
+		"status": {
+			"offline": "Çevrimdışı"
+		},
+		"actions": {
+			"retry": "Tekrar Dene",
+			"settings": "Ayarları Aç"
+		},
+		"help": {
+			"text": "Bu pencere bağlantı yeniden kurulduğunda otomatik olarak kapanacak"
+		}
 	}
 }

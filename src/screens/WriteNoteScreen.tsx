@@ -8,7 +8,7 @@ import {
 	Text,
 	Platform,
 } from "react-native";
-import React, { createRef, useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Animated, {
 	Easing,
 	SlideInUp,
@@ -21,7 +21,6 @@ import Animated, {
 	withSpring,
 	withTiming,
 } from "react-native-reanimated";
-import { commonStyles } from "../utils/commonStyles";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";
 import { Ionicons } from "@expo/vector-icons";
@@ -30,13 +29,21 @@ import { saveNote, updateNote } from "../redux/actions";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { RichEditor, RichToolbar, actions } from "react-native-pell-rich-editor";
+import {
+	RichText,
+	Toolbar,
+	useEditorBridge,
+	TenTapStartKit,
+	DEFAULT_TOOLBAR_ITEMS,
+	BridgeState,
+	useKeyboard,
+} from "@10play/tentap-editor";
+import { ToolbarWithColor } from "../components/ToolbarWithColor";
 
 type Props = NativeStackScreenProps<AppStackParams, "WriteNoteScreen">;
 
 const WriteNoteScreen = ({ navigation, route }: Props) => {
 	const [title, setTitle] = useState(route.params?.note?.title ?? "");
-	const [note, setNote] = useState(route.params?.note?.text ?? "");
 	const [showRichToolbar, setShowRichToolbar] = useState(false);
 	const [isEditorReady, setIsEditorReady] = useState(false);
 	const { currentUser, categories } = useAppSelector((state) => state.global);
@@ -44,12 +51,23 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 	const insets = useSafeAreaInsets();
 	const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
 	const { t } = useTranslation();
-	const richText = createRef<RichEditor>();
+	const { isKeyboardUp: isNativeKeyboardUp, keyboardHeight } = useKeyboard();
+
+	// 10Tap Editor setup
+	const editor = useEditorBridge({
+		autofocus: true,
+		avoidIosKeyboard: true,
+		initialContent: route.params?.note?.text || "",
+		bridgeExtensions: TenTapStartKit,
+	});
 
 	// Animation values
 	const toolbarHeight = useSharedValue(0);
 	const saveButtonScale = useSharedValue(0);
 	const headerScale = useSharedValue(0);
+
+	// Track editor content
+	const [editorContent, setEditorContent] = useState("");
 
 	useEffect(() => {
 		// Animate header on mount
@@ -59,24 +77,17 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		});
 
 		// Show save button if there's content
-		if (note.length > 2 || title.length > 0) {
+		if (editorContent.length > 2 || title.length > 0) {
 			saveButtonScale.value = withSpring(1, {
 				damping: 15,
 				stiffness: 100,
 			});
 		}
-
-		// Initialize rich editor with existing content after a small delay
-		setTimeout(() => {
-			if (richText.current && note) {
-				richText.current.setContentHTML(note);
-			}
-		}, 100);
 	}, []);
 
 	useEffect(() => {
 		// Animate save button based on content
-		if (note.length > 2 || title.length > 0) {
+		if (editorContent.length > 2 || title.length > 0) {
 			saveButtonScale.value = withSpring(1, {
 				damping: 15,
 				stiffness: 100,
@@ -87,17 +98,33 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 				stiffness: 100,
 			});
 		}
-	}, [note, title]);
+	}, [editorContent, title]);
+
+	// Listen to editor content changes
+	useEffect(() => {
+		const unsubscribe = editor._subscribeToEditorStateUpdate((editorState: BridgeState) => {
+			if (editorState.isFocused) openRichToolbar();
+			else closeRichToolbar();
+			// Get HTML content from the editor bridge
+			editor.getHTML().then((html) => {
+				setEditorContent(html);
+			});
+		});
+
+		return () => {
+			unsubscribe();
+		};
+	}, [editor]);
 
 	const handleBack = () => {
 		if (!route.params.note) {
-			if (note || title)
+			if (editorContent || title)
 				dispatch(
 					saveNote({
 						userId: currentUser?.id!,
 						isComplete: false,
 						remind_at: undefined,
-						text: note,
+						text: editorContent,
 						title: title.length ? title : t("untitled"),
 						categoryId: selectedCategoryId!,
 					})
@@ -105,7 +132,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		} else {
 			if (
 				route.params.note.title !== title ||
-				route.params.note.text !== note ||
+				route.params.note.text !== editorContent ||
 				route.params.note.categoryId !== selectedCategoryId
 			) {
 				dispatch(
@@ -113,7 +140,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						userId: currentUser?.id!,
 						isComplete: route.params.note.isComplete,
 						remind_at: route.params.note.remind_at,
-						text: note,
+						text: editorContent,
 						title: title.length ? title : t("untitled"),
 						categoryId: selectedCategoryId!,
 						id: route.params.note.id,
@@ -125,29 +152,24 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		navigation.goBack();
 	};
 
-	const toggleRichToolbar = () => {
-		setShowRichToolbar(!showRichToolbar);
-		toolbarHeight.value = withTiming(showRichToolbar ? 0 : 50, {
+	const closeRichToolbar = () => {
+		setShowRichToolbar(false);
+		toolbarHeight.value = withTiming(0, {
 			duration: 300,
 			easing: Easing.out(Easing.cubic),
 		});
 	};
-
-	const handleEditorReady = () => {
-		setIsEditorReady(true);
-		// Set content after editor is ready
-		if (richText.current && note) {
-			richText.current.setContentHTML(note);
-		}
+	const openRichToolbar = () => {
+		setShowRichToolbar(true);
+		toolbarHeight.value = withTiming(50, {
+			duration: 300,
+			easing: Easing.out(Easing.cubic),
+		});
 	};
-
-	const handleEditorChange = (text: string) => {
-		setNote(text);
-	};
-
 	const handleCategorySelect = (categoryId: number) => {
 		setSelectedCategoryId(categoryId);
 	};
+	console.log("isNativeKeyboardUp: ", isNativeKeyboardUp);
 
 	// Animation styles
 	const headerAnimatedStyle = useAnimatedStyle(() => {
@@ -194,11 +216,13 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						)}
 					</View>
 
-					<TouchableOpacity
-						onPress={toggleRichToolbar}
-						className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
-						<Ionicons name={showRichToolbar ? "close" : "text"} size={20} color={"white"} />
-					</TouchableOpacity>
+					{showRichToolbar && (
+						<TouchableOpacity
+							onPress={closeRichToolbar}
+							className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+							<Ionicons name={"close"} size={20} color={"white"} />
+						</TouchableOpacity>
+					)}
 				</View>
 
 				{/* Title Input */}
@@ -211,11 +235,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						placeholderTextColor='#9CA3AF'
 						value={title}
 						onChangeText={setTitle}
-						style={{
-							fontFamily: "Inter",
-							fontSize: 20,
-							fontWeight: "bold",
-						}}
 					/>
 				</Animated.View>
 
@@ -251,30 +270,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 			<Animated.View
 				style={[toolbarAnimatedStyle, { overflow: "hidden" }]}
 				className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
-				<RichToolbar
-					editor={richText}
-					actions={[
-						actions.setBold,
-						actions.setItalic,
-						actions.setUnderline,
-						actions.heading1,
-						actions.heading2,
-						actions.insertBulletsList,
-						actions.insertOrderedList,
-						actions.insertLink,
-					]}
-					iconTint='#9CA3AF'
-					selectedIconTint='#3B82F6'
-					style={{
-						backgroundColor: "transparent",
-						height: 50,
-						borderTopWidth: 0,
-						borderBottomWidth: 0,
-					}}
-					flatContainerStyle={{
-						paddingHorizontal: 12,
-					}}
-				/>
+				<ToolbarWithColor editor={editor} />
 			</Animated.View>
 
 			{/* Content Area */}
@@ -284,40 +280,12 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 				keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}>
 				<Animated.View className='flex-1 m-4' entering={FadeIn.delay(600).duration(600)}>
 					<View className='bg-white dark:bg-gray-800 rounded-2xl flex-1 p-4' style={styles.contentShadow}>
-						<RichEditor
-							ref={richText}
-							initialContentHTML=''
-							onChange={handleEditorChange}
-							editorInitializedCallback={handleEditorReady}
-							placeholder={t("notHere")}
+						<RichText
+							editor={editor}
 							style={{
 								backgroundColor: "transparent",
 								minHeight: 200,
 								flex: 1,
-							}}
-							useContainer={true}
-							initialHeight={200}
-							editorStyle={{
-								backgroundColor: "transparent",
-								color: "#212121",
-								placeholderColor: "#9CA3AF",
-								contentCSSText: `
-                  * { 
-                    font-size: 16px !important; 
-                    font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif !important;
-                    line-height: 1.5 !important;
-                  }
-                  p { 
-                    margin: 0 0 8px 0 !important; 
-                  }
-                  h1, h2, h3, h4, h5, h6 { 
-                    margin: 12px 0 8px 0 !important; 
-                  }
-                  ul, ol { 
-                    margin: 8px 0 !important; 
-                    padding-left: 20px !important; 
-                  }
-                `,
 							}}
 						/>
 					</View>
@@ -325,13 +293,22 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 			</KeyboardAvoidingView>
 
 			{/* Floating Save Button */}
-			<Animated.View className='absolute right-6 bottom-8' style={[saveButtonAnimatedStyle]}>
+			<Animated.View
+				style={[
+					saveButtonAnimatedStyle,
+					{
+						position: "absolute",
+						bottom: isNativeKeyboardUp ? keyboardHeight + 20 : insets.bottom + 20,
+						right: 20,
+						zIndex: 20,
+					},
+				]}>
 				<TouchableOpacity
 					onPress={handleBack}
-					className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center'
+					className='w-8 h-8 bg-blue-500 rounded-2xl items-center justify-center'
 					style={[styles.fabShadow]}
 					activeOpacity={0.8}>
-					<Ionicons name='checkmark-sharp' size={28} color={"white"} />
+					<Ionicons name='checkmark-sharp' size={20} color={"white"} />
 				</TouchableOpacity>
 			</Animated.View>
 		</SafeAreaView>

@@ -11,6 +11,7 @@ import * as Notifications from "expo-notifications";
 import { useEffect, useRef, useState } from "react";
 import { registerForPushNotificationsAsync } from "./src/utils/notifications";
 import { Platform, StatusBar } from "react-native";
+import NoNetworkModal from "./src/components/NoNetworkModal";
 
 const toastConfig = {
 	customToast: ({ props }: { props: ToastProps }) => (
@@ -51,6 +52,7 @@ export default function App() {
 	}, []);
 	return (
 		<Provider store={store}>
+			<NoNetworkModal />
 			<StatusBar />
 			<Main />
 			<Toast config={toastConfig} />

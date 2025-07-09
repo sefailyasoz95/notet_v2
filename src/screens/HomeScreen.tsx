@@ -260,7 +260,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 							renderItem={({ item, index }) => (
 								<Animated.View
 									entering={SlideInRight.delay(index * 100).duration(600)}
-									style={{ paddingHorizontal: 20, marginBottom: 16 }}>
+									style={{ paddingHorizontal: 20 }}>
 									<NoteItem note={item} index={index} />
 								</Animated.View>
 							)}
@@ -335,7 +335,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 						</View>
 
 						<TouchableOpacity
-							className='w-full bg-gray-100 dark:bg-gray-700 rounded-2xl py-4 items-center'
+							className='w-full bg-gray-100 dark:bg-gray-700 rounded-2xl p-2 items-center'
 							onPress={toggleModal}
 							activeOpacity={0.8}>
 							<Text className='text-black dark:text-white font-semibold'>{t("home.rating.notNow")}</Text>
