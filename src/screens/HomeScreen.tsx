@@ -406,7 +406,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 					</Animated.View>
 
 					{/* Horizontal Scrollable Content */}
-					<Animated.View className='flex-1' entering={FadeIn.delay(400).duration(600)}>
+					<Animated.View className='flex-1 mt-5' entering={FadeIn.delay(400).duration(600)}>
 						<ScrollView
 							ref={horizontalScrollRef}
 							horizontal
@@ -424,7 +424,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 						className={"absolute right-6 bottom-8"}
 						entering={SlideInRight.delay(800).duration(600).easing(Easing.out(Easing.cubic))}>
 						<TouchableOpacity
-							className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center'
+							className='w-10 h-10 bg-blue-500 rounded-2xl items-center justify-center'
 							style={[styles.fabShadow]}
 							onPress={() => {
 								if (tabs === "notes") {

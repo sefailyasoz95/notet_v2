@@ -3,6 +3,7 @@ import Toast from "react-native-toast-message";
 import { Provider } from "react-redux";
 import * as SplashScreen from "expo-splash-screen";
 import "./i18n";
+import "./src/styles/animations.css";
 import ToastComponent, { ToastProps } from "./src/components/ToastComponent";
 import Main from "./Main";
 import store from "./src/redux/store";
