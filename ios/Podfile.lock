@@ -51,6 +51,8 @@ PODS:
     - Yoga
   - ExpoStoreReview (7.0.2):
     - ExpoModulesCore
+  - ExpoSystemUI (3.0.7):
+    - ExpoModulesCore
   - EXSplashScreen (0.27.7):
     - DoubleConversion
     - ExpoModulesCore
@@ -1427,6 +1429,7 @@ DEPENDENCIES:
   - ExpoKeepAwake (from `../node_modules/expo-keep-awake/ios`)
   - ExpoModulesCore (from `../node_modules/expo-modules-core`)
   - ExpoStoreReview (from `../node_modules/expo-store-review/ios`)
+  - ExpoSystemUI (from `../node_modules/expo-system-ui/ios`)
   - EXSplashScreen (from `../node_modules/expo-splash-screen/ios`)
   - FBLazyVector (from `../node_modules/react-native/Libraries/FBLazyVector`)
   - fmt (from `../node_modules/react-native/third-party-podspecs/fmt.podspec`)
@@ -1538,6 +1541,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/expo-modules-core"
   ExpoStoreReview:
     :path: "../node_modules/expo-store-review/ios"
+  ExpoSystemUI:
+    :path: "../node_modules/expo-system-ui/ios"
   EXSplashScreen:
     :path: "../node_modules/expo-splash-screen/ios"
   FBLazyVector:
@@ -1689,10 +1694,11 @@ SPEC CHECKSUMS:
   ExpoKeepAwake: 3b8815d9dd1d419ee474df004021c69fdd316d08
   ExpoModulesCore: 831ece8311a489418746925820bbffdda587d6f4
   ExpoStoreReview: 15f9a636b62ff00bb21cbe9a9fe22f0239da4481
+  ExpoSystemUI: d4f065a016cae6721b324eb659cdee4d4cf0cb26
   EXSplashScreen: 3cad09949c2ca6730cbb2801b8c51cb87692425a
   FBLazyVector: ac12dc084d1c8ec4cc4d7b3cf1b0ebda6dab85af
   fmt: 4c2741a687cc09f0634a2e2c72a838b99f1ff120
-  glog: c5d68082e772fa1c511173d6b30a9de2c05a69a2
+  glog: fdfdfe5479092de0c4bdbebedd9056951f092c4f
   hermes-engine: 8c1577f3fdb849cbe7729c2e7b5abc4b845e88f8
   libavif: 84bbb62fb232c3018d6f1bab79beea87e35de7b7
   libdav1d: 23581a4d8ec811ff171ed5e2e05cd27bad64c39f

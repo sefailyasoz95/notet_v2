@@ -1,4 +1,14 @@
-import { ActivityIndicator, Modal, StyleSheet, Text, TouchableOpacity, View, FlatList } from "react-native";
+import {
+	ActivityIndicator,
+	Modal,
+	StyleSheet,
+	Text,
+	TouchableOpacity,
+	View,
+	FlatList,
+	ScrollView,
+	Dimensions,
+} from "react-native";
 import React, { createRef, useEffect, useState } from "react";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AppStackParams } from "../utils/types";
@@ -28,9 +38,10 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = NativeStackScreenProps<AppStackParams, "HomeScreen">;
 
-const HEADER_MAX_HEIGHT = 180;
-const HEADER_MIN_HEIGHT = 100;
+const HEADER_MAX_HEIGHT = 220; // Increased to accommodate tabs
+const HEADER_MIN_HEIGHT = 140; // Increased to accommodate tabs
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation, route }: Props) => {
 	const { t } = useTranslation();
@@ -39,6 +50,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	);
 	const insets = useSafeAreaInsets();
 	const scrollRef = createRef<FlatList>();
+	const horizontalScrollRef = createRef<ScrollView>();
 	const [tabs, setTabs] = useState<"notes" | "categories">("notes");
 	const dispatch = useAppDispatch();
 	const { showToast } = useToast();
@@ -89,13 +101,10 @@ const HomeScreen = ({ navigation, route }: Props) => {
 		}
 	}, [currentUser]);
 
-	const toggleTab = () => {
-		if (tabs === "notes") {
-			scrollRef.current?.scrollToEnd();
-		} else {
-			scrollRef.current?.scrollToOffset({ offset: 0, animated: true });
-		}
-		setTabs((prev) => (prev === "notes" ? "categories" : "notes"));
+	const toggleTab = (tab: "notes" | "categories") => {
+		setTabs(tab);
+		const targetOffset = tab === "notes" ? 0 : SCREEN_WIDTH;
+		horizontalScrollRef.current?.scrollTo({ x: targetOffset, animated: true });
 	};
 
 	const handleRating = async (rate: number) => {
@@ -152,6 +161,24 @@ const HomeScreen = ({ navigation, route }: Props) => {
 		};
 	});
 
+	// Tab bar animation
+	const tabBarAnimatedStyle = useAnimatedStyle(() => {
+		const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
+
+		return {
+			opacity,
+		};
+	});
+
+	// Mini tab bar animation
+	const miniTabBarAnimatedStyle = useAnimatedStyle(() => {
+		const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
+
+		return {
+			opacity,
+		};
+	});
+
 	// Welcome text animation
 	const welcomeTextAnimatedStyle = useAnimatedStyle(() => {
 		const scale = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [1, 0.8], "clamp");
@@ -160,6 +187,146 @@ const HomeScreen = ({ navigation, route }: Props) => {
 			transform: [{ scale }],
 		};
 	});
+
+	const renderTabBar = (isCompact = false) => (
+		<View className={`flex-row mx-6 ${isCompact ? "mb-2" : "mb-4"}`}>
+			<View className='flex-row bg-white/10 dark:bg-black/10 rounded-xl p-1 flex-1'>
+				<TouchableOpacity
+					onPress={() => toggleTab("notes")}
+					className={`flex-1 py-2 px-4 rounded-lg ${tabs === "notes" ? "bg-white/20 dark:bg-black/20" : ""}`}
+					activeOpacity={0.8}>
+					<Text
+						className={`text-center font-semibold ${isCompact ? "text-sm" : "text-base"} ${
+							tabs === "notes" ? "text-white dark:text-black" : "text-white/70 dark:text-black/70"
+						}`}>
+						{t("home.notes")} ({savedNotes.length})
+					</Text>
+				</TouchableOpacity>
+				<TouchableOpacity
+					onPress={() => toggleTab("categories")}
+					className={`flex-1 py-2 px-4 rounded-lg ${tabs === "categories" ? "bg-white/20 dark:bg-black/20" : ""}`}
+					activeOpacity={0.8}>
+					<Text
+						className={`text-center font-semibold ${isCompact ? "text-sm" : "text-base"} ${
+							tabs === "categories" ? "text-white dark:text-black" : "text-white/70 dark:text-black/70"
+						}`}>
+						{t("home.categories")} ({categories.length})
+					</Text>
+				</TouchableOpacity>
+			</View>
+		</View>
+	);
+
+	const renderNotesTab = () => (
+		<View style={{ width: SCREEN_WIDTH }}>
+			<Animated.FlatList
+				ref={scrollRef}
+				onScroll={scrollHandler}
+				scrollEventThrottle={16}
+				contentContainerStyle={{
+					paddingTop: HEADER_MAX_HEIGHT,
+					paddingBottom: 120,
+				}}
+				data={savedNotes}
+				renderItem={({ item, index }) => (
+					<Animated.View entering={SlideInRight.delay(index * 100).duration(600)} style={{ paddingHorizontal: 20 }}>
+						<NoteItem note={item} index={index} />
+					</Animated.View>
+				)}
+				ListEmptyComponent={() =>
+					loading ? (
+						<></>
+					) : (
+						<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
+							<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
+								<Ionicons name='document-outline' size={40} color='#9CA3AF' />
+							</View>
+							<Text className='text-black dark:text-white font-semibold text-lg mb-2'>{t("home.noNotesTitle")}</Text>
+							<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>{t("home.noNotesDescription")}</Text>
+						</Animated.View>
+					)
+				}
+				showsVerticalScrollIndicator={false}
+				keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+			/>
+		</View>
+	);
+
+	const renderCategoriesTab = () => (
+		<View style={{ width: SCREEN_WIDTH }} className='my-4'>
+			<Animated.FlatList
+				onScroll={scrollHandler}
+				scrollEventThrottle={16}
+				contentContainerStyle={{
+					paddingTop: HEADER_MAX_HEIGHT,
+					paddingBottom: 120,
+				}}
+				data={categories}
+				renderItem={({ item, index }) => (
+					<Animated.View
+						entering={SlideInRight.delay(index * 100).duration(600)}
+						style={{ paddingHorizontal: 20, marginBottom: 12 }}>
+						<TouchableOpacity
+							onPress={() => setSelectedCategoryId(item.id)}
+							className={`p-4 rounded-2xl border-2 ${
+								selectedCategoryId === item.id
+									? "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
+									: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
+							}`}
+							activeOpacity={0.8}>
+							<View className='flex-row items-center justify-between'>
+								<View className='flex-row items-center flex-1'>
+									<View
+										className={`w-10 h-10 rounded-xl items-center justify-center mr-3 ${
+											selectedCategoryId === item.id ? "bg-blue-500" : "bg-gray-100 dark:bg-gray-700"
+										}`}>
+										<Ionicons name='folder' size={20} color={selectedCategoryId === item.id ? "white" : "#9CA3AF"} />
+									</View>
+									<View className='flex-1'>
+										<Text
+											className={`font-semibold text-base ${
+												selectedCategoryId === item.id
+													? "text-blue-700 dark:text-blue-300"
+													: "text-black dark:text-white"
+											}`}>
+											{item.name}
+										</Text>
+										<Text className='text-gray-500 dark:text-gray-400 text-sm'>
+											{savedNotes.filter((note) => note.categoryId === item.id).length} notes
+										</Text>
+									</View>
+								</View>
+								{selectedCategoryId === item.id && (
+									<View className='w-6 h-6 bg-blue-500 rounded-full items-center justify-center'>
+										<Ionicons name='checkmark' size={16} color='white' />
+									</View>
+								)}
+							</View>
+						</TouchableOpacity>
+					</Animated.View>
+				)}
+				ListEmptyComponent={() =>
+					loading ? (
+						<></>
+					) : (
+						<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
+							<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
+								<Ionicons name='folder-outline' size={40} color='#9CA3AF' />
+							</View>
+							<Text className='text-black dark:text-white font-semibold text-lg mb-2'>
+								{t("home.noCategoriesTitle")}
+							</Text>
+							<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>
+								{t("home.noCategoriesDescription")}
+							</Text>
+						</Animated.View>
+					)
+				}
+				showsVerticalScrollIndicator={false}
+				keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+			/>
+		</View>
+	);
 
 	return (
 		<SafeAreaView className='flex-1 bg-white dark:bg-gray-900' edges={["left", "right"]}>
@@ -174,11 +341,11 @@ const HomeScreen = ({ navigation, route }: Props) => {
 				<>
 					{/* Animated Header */}
 					<Animated.View
-						className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end px-6'
+						className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end'
 						style={[styles.headerShadow, headerAnimatedStyle, { paddingTop: insets.top }]}>
 						{/* Main Header Content */}
 						<Animated.View style={[headerContentAnimatedStyle]} className='pb-4'>
-							<View className='flex-row items-center justify-between mb-4'>
+							<View className='flex-row items-center justify-between mb-4 px-6'>
 								<Animated.View style={[welcomeTextAnimatedStyle]} className='flex-row items-center space-x-3'>
 									<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
 										<Image
@@ -204,86 +371,52 @@ const HomeScreen = ({ navigation, route }: Props) => {
 								</TouchableOpacity>
 							</View>
 
-							{/* Quick Stats */}
-							<View className='flex-row justify-between px-4'>
-								<View className='items-center'>
-									<Text className='text-white dark:text-black font-bold text-lg'>{savedNotes.length}</Text>
-									<Text className='text-white/70 dark:text-black/70 text-xs'>{t("home.totalNotes")}</Text>
-								</View>
-								<View className='items-center'>
-									<Text className='text-white dark:text-black font-bold text-lg'>{categories.length}</Text>
-									<Text className='text-white/70 dark:text-black/70 text-xs'>{t("home.categories")}</Text>
-								</View>
-								<View className='items-center'>
-									<Text className='text-blue-400 font-bold text-lg'>
-										{currentUser?.isPremium ? t("home.premium") : t("home.free")}
-									</Text>
-									<Text className='text-white/70 dark:text-black/70 text-xs'>{t("home.plan")}</Text>
-								</View>
-							</View>
+							{/* Tab Bar */}
+							<Animated.View style={[tabBarAnimatedStyle]}>{renderTabBar()}</Animated.View>
 						</Animated.View>
-						<Animated.View
-							style={[miniHeaderAnimatedStyle]}
-							className='absolute bottom-4 left-6 right-6 flex-row items-center justify-between'>
-							<View className='flex-row items-center space-x-3'>
-								<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
-									<Image
-										className='w-6 h-6 rounded-md'
-										source={require("../../assets/favicon.png")}
-										contentFit='cover'
-										transition={100}
-									/>
+
+						{/* Mini Header */}
+						<Animated.View style={[miniHeaderAnimatedStyle]} className='absolute bottom-2 left-0 right-0'>
+							<View className='flex-row items-center justify-between px-6 mb-2'>
+								<View className='flex-row items-center space-x-3'>
+									<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
+										<Image
+											className='w-6 h-6 rounded-md'
+											source={require("../../assets/favicon.png")}
+											contentFit='cover'
+											transition={100}
+										/>
+									</View>
+									<Text className='text-white dark:text-black font-bold text-lg'>
+										{tabs === "notes"
+											? `${savedNotes.length} ${t("home.notes")}`
+											: `${categories.length} ${t("home.categories")}`}
+									</Text>
 								</View>
-								<Text className='text-white dark:text-black font-bold text-lg'>
-									{savedNotes.length} {t("home.notes")}
-								</Text>
+								<TouchableOpacity
+									onPress={() => navigation.navigate("ProfileScreen")}
+									className='w-8 h-8 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+									<Ionicons name='person-sharp' size={16} color={"white"} />
+								</TouchableOpacity>
 							</View>
-							<TouchableOpacity
-								onPress={() => navigation.navigate("ProfileScreen")}
-								className='w-8 h-8 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
-								<Ionicons name='person-sharp' size={16} color={"white"} />
-							</TouchableOpacity>
+
+							{/* Mini Tab Bar */}
+							<Animated.View style={[miniTabBarAnimatedStyle]}>{renderTabBar(true)}</Animated.View>
 						</Animated.View>
 					</Animated.View>
 
-					{/* Notes List */}
+					{/* Horizontal Scrollable Content */}
 					<Animated.View className='flex-1' entering={FadeIn.delay(400).duration(600)}>
-						<Animated.FlatList
-							ref={scrollRef}
-							onScroll={scrollHandler}
-							scrollEventThrottle={16}
-							contentContainerStyle={{
-								paddingTop: HEADER_MAX_HEIGHT,
-								paddingBottom: 120,
-							}}
-							data={savedNotes}
-							renderItem={({ item, index }) => (
-								<Animated.View
-									entering={SlideInRight.delay(index * 100).duration(600)}
-									style={{ paddingHorizontal: 20 }}>
-									<NoteItem note={item} index={index} />
-								</Animated.View>
-							)}
-							ListEmptyComponent={() =>
-								loading ? (
-									<></>
-								) : (
-									<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
-										<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
-											<Ionicons name='document-outline' size={40} color='#9CA3AF' />
-										</View>
-										<Text className='text-black dark:text-white font-semibold text-lg mb-2'>
-											{t("home.noNotesTitle")}
-										</Text>
-										<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>
-											{t("home.noNotesDescription")}
-										</Text>
-									</Animated.View>
-								)
-							}
-							showsVerticalScrollIndicator={false}
-							keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-						/>
+						<ScrollView
+							ref={horizontalScrollRef}
+							horizontal
+							pagingEnabled
+							showsHorizontalScrollIndicator={false}
+							scrollEnabled={false}
+							contentContainerStyle={{ flexGrow: 1 }}>
+							{renderNotesTab()}
+							{renderCategoriesTab()}
+						</ScrollView>
 					</Animated.View>
 
 					{/* Floating Action Button */}
@@ -294,9 +427,14 @@ const HomeScreen = ({ navigation, route }: Props) => {
 							className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center'
 							style={[styles.fabShadow]}
 							onPress={() => {
-								navigation.navigate("WriteNoteScreen", {
-									categoryId: selectedCategoryId || categories[0].id!,
-								});
+								if (tabs === "notes") {
+									navigation.navigate("WriteNoteScreen", {
+										categoryId: selectedCategoryId || categories[0].id!,
+									});
+								} else {
+									// Handle add category action
+									// navigation.navigate("AddCategoryScreen");
+								}
 							}}
 							activeOpacity={0.8}>
 							<Ionicons name='add-sharp' size={28} color={"white"} />
