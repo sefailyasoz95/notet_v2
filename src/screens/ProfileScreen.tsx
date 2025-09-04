@@ -22,6 +22,10 @@ import Animated, {
 	SlideInDown,
 	SlideInRight,
 	SlideInUp,
+	useAnimatedScrollHandler,
+	useAnimatedStyle,
+	useSharedValue,
+	interpolate,
 } from "react-native-reanimated";
 import { useAppDispatch, useAppSelector } from "../redux/store";
 import { useTranslation } from "react-i18next";
@@ -41,6 +45,10 @@ import { useColorScheme } from "nativewind";
 
 type Props = NativeStackScreenProps<AppStackParams, "ProfileScreen">;
 
+const HEADER_MAX_HEIGHT = 150;
+const HEADER_MIN_HEIGHT = 100;
+const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
+
 const ProfileScreen = ({ navigation, route }: Props) => {
 	const { currentUser, loading, success, message, error } = useAppSelector((state) => state.global);
 	const { t } = useTranslation();
@@ -54,6 +62,43 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 	const toggleModal = () => setModalVisible(!modalVisible);
 	const toggleLanguageModal = () => setLanguageModalVisible(!languageModalVisible);
 	const dispatch = useAppDispatch();
+
+	const scrollY = useSharedValue(0);
+
+	const scrollHandler = useAnimatedScrollHandler((event) => {
+		scrollY.value = event.contentOffset.y;
+	});
+
+	const headerAnimatedStyle = useAnimatedStyle(() => {
+		const height = interpolate(
+			scrollY.value,
+			[0, HEADER_SCROLL_DISTANCE],
+			[HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+			"clamp"
+		);
+
+		return {
+			height,
+		};
+	});
+
+	const headerContentAnimatedStyle = useAnimatedStyle(() => {
+		const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
+		const translateY = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [0, -20], "clamp");
+
+		return {
+			opacity,
+			transform: [{ translateY }],
+		};
+	});
+
+	const miniHeaderAnimatedStyle = useAnimatedStyle(() => {
+		const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
+
+		return {
+			opacity,
+		};
+	});
 
 	const handleSignUpModal = async () => {
 		if ((!email || !fullName) && modalVisible) {
@@ -158,39 +203,68 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 
 			{/* Header */}
 			<Animated.View
-				className='bg-black dark:bg-white rounded-b-3xl justify-end px-6 pb-6'
-				style={[styles.headerShadow, { paddingTop: insets.top + 20, height: 160 }]}
-				entering={SlideInUp.duration(600).easing(Easing.out(Easing.cubic))}>
-				<View className='flex-row items-center justify-between'>
-					<View className='flex-row items-center space-x-4'>
-						<TouchableOpacity
-							onPress={navigation.goBack}
-							className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
-							<Ionicons name='chevron-back' size={24} color={"white"} />
-						</TouchableOpacity>
-						<View>
-							<Text className='text-white dark:text-black font-bold text-2xl'>{t("profile")}</Text>
-							<Text className='text-white/70 dark:text-black/70 text-sm'>
-								{currentUser?.fullName ? currentUser.fullName : "Guest User"}
-							</Text>
+				className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end'
+				style={[styles.headerShadow, headerAnimatedStyle]}>
+				{/* Main Header Content */}
+				<Animated.View style={[headerContentAnimatedStyle]} className='pb-4'>
+					<View className='flex-row items-center justify-between px-6'>
+						<View className='flex-row items-center space-x-4'>
+							<TouchableOpacity
+								onPress={navigation.goBack}
+								className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+								<Ionicons name='chevron-back' size={24} color='white' />
+							</TouchableOpacity>
+							<View>
+								<Text className='text-white dark:text-black font-bold text-2xl'>{t("profile")}</Text>
+								<Text className='text-white/70 dark:text-black/70 text-sm'>
+									{currentUser?.fullName ? currentUser.fullName : "Guest User"}
+								</Text>
+							</View>
+						</View>
+						<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
+							<Image
+								className='w-8 h-8 rounded-lg'
+								source={require("../../assets/favicon.png")}
+								contentFit='cover'
+								transition={100}
+							/>
 						</View>
 					</View>
-					<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
-						<Image
-							className='w-8 h-8 rounded-lg'
-							source={require("../../assets/favicon.png")}
-							contentFit='cover'
-							transition={100}
-						/>
+				</Animated.View>
+
+				{/* Mini Header */}
+				<Animated.View style={[miniHeaderAnimatedStyle]} className='absolute bottom-2 pb-1 left-0 right-0'>
+					<View className='flex-row items-center justify-between px-6'>
+						<View className='flex-row items-center space-x-3'>
+							<TouchableOpacity
+								onPress={navigation.goBack}
+								className='w-8 h-8 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+								<Ionicons name='chevron-back' size={20} color='white' />
+							</TouchableOpacity>
+							<Text className='text-white dark:text-black font-bold text-lg'>{t("profile")}</Text>
+						</View>
+						<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
+							<Image
+								className='w-6 h-6 rounded-md'
+								source={require("../../assets/favicon.png")}
+								contentFit='cover'
+								transition={100}
+							/>
+						</View>
 					</View>
-				</View>
+				</Animated.View>
 			</Animated.View>
 
 			{/* Profile Content */}
-			<ScrollView
+			<Animated.ScrollView
 				className='flex-1 px-6'
-				contentContainerStyle={{ paddingTop: 24, paddingBottom: 120 }}
-				showsVerticalScrollIndicator={false}>
+				contentContainerStyle={{
+					paddingTop: HEADER_MAX_HEIGHT + 24,
+					paddingBottom: 120,
+				}}
+				showsVerticalScrollIndicator={false}
+				onScroll={scrollHandler}
+				scrollEventThrottle={16}>
 				{/* User Info Card */}
 				<Animated.View
 					className='bg-white dark:bg-gray-800 rounded-3xl p-6 mb-6 border border-gray-100 dark:border-gray-700'
@@ -238,7 +312,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 						</Animated.View>
 					))}
 				</View>
-			</ScrollView>
+			</Animated.ScrollView>
 
 			{/* Footer */}
 			<Animated.View

@@ -38,8 +38,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 type Props = NativeStackScreenProps<AppStackParams, "HomeScreen">;
 
-const HEADER_MAX_HEIGHT = 220; // Increased to accommodate tabs
-const HEADER_MIN_HEIGHT = 140; // Increased to accommodate tabs
+const HEADER_MAX_HEIGHT = 150; // Reduced from 220
+const HEADER_MIN_HEIGHT = 100; // Reduced from 140
 const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -48,17 +48,15 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	const { currentUser, onboardingPassed, savedNotes, loading, categories, success, error, message } = useAppSelector(
 		(state) => state.global
 	);
+	const horizontalScrollRef = createRef<ScrollView>();
 	const insets = useSafeAreaInsets();
 	const scrollRef = createRef<FlatList>();
-	const horizontalScrollRef = createRef<ScrollView>();
-	const [tabs, setTabs] = useState<"notes" | "categories">("notes");
+	const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id);
+	const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 	const dispatch = useAppDispatch();
 	const { showToast } = useToast();
 	const [ratingModal, setRatingModal] = useState<boolean>(false);
 	const [givenRate, setGivenRate] = useState<number>(4);
-	const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id);
-	const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-
 	// Animated values
 	const scrollY = useSharedValue(0);
 
@@ -69,6 +67,12 @@ const HomeScreen = ({ navigation, route }: Props) => {
 		dispatch(getCurrentUser(deviceId));
 	};
 
+	const handleRating = async (rate: number) => {
+		setGivenRate(rate);
+		dispatch(updateUserInfo({ rating: rate, id: currentUser?.id }));
+		toggleModal();
+		await StoreReview.requestReview();
+	};
 	useEffect(() => {
 		fetchUser();
 	}, [onboardingPassed]);
@@ -100,19 +104,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 			);
 		}
 	}, [currentUser]);
-
-	const toggleTab = (tab: "notes" | "categories") => {
-		setTabs(tab);
-		const targetOffset = tab === "notes" ? 0 : SCREEN_WIDTH;
-		horizontalScrollRef.current?.scrollTo({ x: targetOffset, animated: true });
-	};
-
-	const handleRating = async (rate: number) => {
-		setGivenRate(rate);
-		dispatch(updateUserInfo({ rating: rate, id: currentUser?.id }));
-		toggleModal();
-		await StoreReview.requestReview();
-	};
 
 	const updateHeaderState = (collapsed: boolean) => {
 		if (collapsed !== isHeaderCollapsed) {
@@ -188,35 +179,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 		};
 	});
 
-	const renderTabBar = (isCompact = false) => (
-		<View className={`flex-row mx-6 ${isCompact ? "mb-2" : "mb-4"}`}>
-			<View className='flex-row bg-white/10 dark:bg-black/10 rounded-xl p-1 flex-1'>
-				<TouchableOpacity
-					onPress={() => toggleTab("notes")}
-					className={`flex-1 py-2 px-4 rounded-lg ${tabs === "notes" ? "bg-white/20 dark:bg-black/20" : ""}`}
-					activeOpacity={0.8}>
-					<Text
-						className={`text-center font-semibold ${isCompact ? "text-sm" : "text-base"} ${
-							tabs === "notes" ? "text-white dark:text-black" : "text-white/70 dark:text-black/70"
-						}`}>
-						{t("home.notes")} ({savedNotes.length})
-					</Text>
-				</TouchableOpacity>
-				<TouchableOpacity
-					onPress={() => toggleTab("categories")}
-					className={`flex-1 py-2 px-4 rounded-lg ${tabs === "categories" ? "bg-white/20 dark:bg-black/20" : ""}`}
-					activeOpacity={0.8}>
-					<Text
-						className={`text-center font-semibold ${isCompact ? "text-sm" : "text-base"} ${
-							tabs === "categories" ? "text-white dark:text-black" : "text-white/70 dark:text-black/70"
-						}`}>
-						{t("home.categories")} ({categories.length})
-					</Text>
-				</TouchableOpacity>
-			</View>
-		</View>
-	);
-
 	const renderNotesTab = () => (
 		<View style={{ width: SCREEN_WIDTH }}>
 			<Animated.FlatList
@@ -252,82 +214,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 		</View>
 	);
 
-	const renderCategoriesTab = () => (
-		<View style={{ width: SCREEN_WIDTH }} className='my-4'>
-			<Animated.FlatList
-				onScroll={scrollHandler}
-				scrollEventThrottle={16}
-				contentContainerStyle={{
-					paddingTop: HEADER_MAX_HEIGHT,
-					paddingBottom: 120,
-				}}
-				data={categories}
-				renderItem={({ item, index }) => (
-					<Animated.View
-						entering={SlideInRight.delay(index * 100).duration(600)}
-						style={{ paddingHorizontal: 20, marginBottom: 12 }}>
-						<TouchableOpacity
-							onPress={() => setSelectedCategoryId(item.id)}
-							className={`p-4 rounded-2xl border-2 ${
-								selectedCategoryId === item.id
-									? "bg-blue-50 dark:bg-blue-900/20 border-blue-500"
-									: "bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700"
-							}`}
-							activeOpacity={0.8}>
-							<View className='flex-row items-center justify-between'>
-								<View className='flex-row items-center flex-1'>
-									<View
-										className={`w-10 h-10 rounded-xl items-center justify-center mr-3 ${
-											selectedCategoryId === item.id ? "bg-blue-500" : "bg-gray-100 dark:bg-gray-700"
-										}`}>
-										<Ionicons name='folder' size={20} color={selectedCategoryId === item.id ? "white" : "#9CA3AF"} />
-									</View>
-									<View className='flex-1'>
-										<Text
-											className={`font-semibold text-base ${
-												selectedCategoryId === item.id
-													? "text-blue-700 dark:text-blue-300"
-													: "text-black dark:text-white"
-											}`}>
-											{item.name}
-										</Text>
-										<Text className='text-gray-500 dark:text-gray-400 text-sm'>
-											{savedNotes.filter((note) => note.categoryId === item.id).length} notes
-										</Text>
-									</View>
-								</View>
-								{selectedCategoryId === item.id && (
-									<View className='w-6 h-6 bg-blue-500 rounded-full items-center justify-center'>
-										<Ionicons name='checkmark' size={16} color='white' />
-									</View>
-								)}
-							</View>
-						</TouchableOpacity>
-					</Animated.View>
-				)}
-				ListEmptyComponent={() =>
-					loading ? (
-						<></>
-					) : (
-						<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
-							<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
-								<Ionicons name='folder-outline' size={40} color='#9CA3AF' />
-							</View>
-							<Text className='text-black dark:text-white font-semibold text-lg mb-2'>
-								{t("home.noCategoriesTitle")}
-							</Text>
-							<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>
-								{t("home.noCategoriesDescription")}
-							</Text>
-						</Animated.View>
-					)
-				}
-				showsVerticalScrollIndicator={false}
-				keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-			/>
-		</View>
-	);
-
 	return (
 		<SafeAreaView className='flex-1 bg-white dark:bg-gray-900' edges={["left", "right"]}>
 			{loading && (
@@ -342,9 +228,9 @@ const HomeScreen = ({ navigation, route }: Props) => {
 					{/* Animated Header */}
 					<Animated.View
 						className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end'
-						style={[styles.headerShadow, headerAnimatedStyle, { paddingTop: insets.top }]}>
+						style={[styles.headerShadow, headerAnimatedStyle]}>
 						{/* Main Header Content */}
-						<Animated.View style={[headerContentAnimatedStyle]} className='pb-4'>
+						<Animated.View style={[headerContentAnimatedStyle]} className='pb-2'>
 							<View className='flex-row items-center justify-between mb-4 px-6'>
 								<Animated.View style={[welcomeTextAnimatedStyle]} className='flex-row items-center space-x-3'>
 									<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
@@ -370,14 +256,12 @@ const HomeScreen = ({ navigation, route }: Props) => {
 									<Ionicons name='person-sharp' size={20} color={"white"} />
 								</TouchableOpacity>
 							</View>
-
-							{/* Tab Bar */}
-							<Animated.View style={[tabBarAnimatedStyle]}>{renderTabBar()}</Animated.View>
 						</Animated.View>
 
 						{/* Mini Header */}
+						{/* Mini Header */}
 						<Animated.View style={[miniHeaderAnimatedStyle]} className='absolute bottom-2 left-0 right-0'>
-							<View className='flex-row items-center justify-between px-6 mb-2'>
+							<View className='flex-row items-center justify-between px-6'>
 								<View className='flex-row items-center space-x-3'>
 									<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
 										<Image
@@ -388,9 +272,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 										/>
 									</View>
 									<Text className='text-white dark:text-black font-bold text-lg'>
-										{tabs === "notes"
-											? `${savedNotes.length} ${t("home.notes")}`
-											: `${categories.length} ${t("home.categories")}`}
+										{savedNotes.length} {t("home.notes")}
 									</Text>
 								</View>
 								<TouchableOpacity
@@ -399,9 +281,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 									<Ionicons name='person-sharp' size={16} color={"white"} />
 								</TouchableOpacity>
 							</View>
-
-							{/* Mini Tab Bar */}
-							<Animated.View style={[miniTabBarAnimatedStyle]}>{renderTabBar(true)}</Animated.View>
 						</Animated.View>
 					</Animated.View>
 
@@ -415,7 +294,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 							scrollEnabled={false}
 							contentContainerStyle={{ flexGrow: 1 }}>
 							{renderNotesTab()}
-							{renderCategoriesTab()}
 						</ScrollView>
 					</Animated.View>
 
@@ -427,14 +305,9 @@ const HomeScreen = ({ navigation, route }: Props) => {
 							className='w-10 h-10 bg-blue-500 rounded-2xl items-center justify-center'
 							style={[styles.fabShadow]}
 							onPress={() => {
-								if (tabs === "notes") {
-									navigation.navigate("WriteNoteScreen", {
-										categoryId: selectedCategoryId || categories[0].id!,
-									});
-								} else {
-									// Handle add category action
-									// navigation.navigate("AddCategoryScreen");
-								}
+								navigation.navigate("WriteNoteScreen", {
+									categoryId: selectedCategoryId || categories[0].id!,
+								});
 							}}
 							activeOpacity={0.8}>
 							<Ionicons name='add-sharp' size={28} color={"white"} />

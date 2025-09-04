@@ -179,8 +179,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		};
 	});
 
-	const selectedCategory = categories.find((cat) => cat.id === selectedCategoryId);
-
 	return (
 		<SafeAreaView className='flex-1 bg-gray-50 dark:bg-gray-900' edges={["left", "right"]}>
 			{/* Animated Header */}
@@ -199,9 +197,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						<Text className='text-white dark:text-black font-bold text-lg text-center'>
 							{route.params.note ? t("editNote") : t("newNote")}
 						</Text>
-						{selectedCategory && (
-							<Text className='text-white/70 dark:text-black/70 text-sm text-center'>{t(selectedCategory.name)}</Text>
-						)}
 					</View>
 
 					{showRichToolbar && (
@@ -224,33 +219,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						value={title}
 						onChangeText={setTitle}
 					/>
-				</Animated.View>
-
-				{/* Category Selection */}
-				<Animated.View entering={FadeInLeft.delay(400).duration(600)} className='mb-4'>
-					<ScrollView
-						horizontal
-						showsHorizontalScrollIndicator={false}
-						contentContainerStyle={{ paddingHorizontal: 4 }}>
-						{categories.map((cat, index) => (
-							<Animated.View entering={FadeInLeft.delay(200 * (index + 1)).duration(600)} key={cat.id} className='mr-3'>
-								<TouchableOpacity
-									onPress={() => handleCategorySelect(cat.id!)}
-									className={`px-4 py-2 rounded-full border-2 ${
-										selectedCategoryId === cat.id
-											? "border-blue-500 bg-blue-500/20"
-											: "border-white/30 dark:border-gray-600"
-									}`}>
-									<Text
-										className={`font-semibold ${
-											selectedCategoryId === cat.id ? "text-blue-400" : "text-white dark:text-gray-300"
-										}`}>
-										{t(cat.name)}
-									</Text>
-								</TouchableOpacity>
-							</Animated.View>
-						))}
-					</ScrollView>
 				</Animated.View>
 			</Animated.View>
 
