@@ -37,6 +37,7 @@ import * as StoreReview from "expo-store-review";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Image } from "expo-image";
+import { useColorScheme } from "nativewind";
 
 type Props = NativeStackScreenProps<AppStackParams, "ProfileScreen">;
 
@@ -102,7 +103,11 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 			},
 		]);
 	};
-
+	const { colorScheme, toggleColorScheme } = useColorScheme();
+	const handleThemeChange = async () => {
+		await AsyncStorage.setItem("theme", colorScheme === "dark" ? "light" : "dark");
+		toggleColorScheme();
+	};
 	const profileMenuItems = [
 		{
 			id: 1,
@@ -116,6 +121,13 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 			icon: "eye",
 			title: t("termsOfService"),
 			onPress: () => navigation.navigate("DescriptionScreen", { description: TermsOfService }),
+			color: "#10B981",
+		},
+		{
+			id: 2,
+			icon: colorScheme === "dark" ? "sunny" : "moon",
+			title: t("theme"),
+			onPress: () => handleThemeChange(),
 			color: "#10B981",
 		},
 		{
@@ -197,18 +209,6 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 							</Text>
 						</View>
 					</View>
-					<View className='flex-row justify-between bg-gray-50 dark:bg-gray-700 rounded-2xl p-4'>
-						<View className='items-center'>
-							<Text className='text-black dark:text-white font-bold text-lg'>
-								{currentUser?.isPremium ? "Premium" : "Free"}
-							</Text>
-							<Text className='text-gray-600 dark:text-gray-400 text-xs'>Plan</Text>
-						</View>
-						<View className='items-center'>
-							<Text className='text-black dark:text-white font-bold text-lg'>{i18next.language.toUpperCase()}</Text>
-							<Text className='text-gray-600 dark:text-gray-400 text-xs'>Language</Text>
-						</View>
-					</View>
 				</Animated.View>
 
 				{/* Menu Items */}
@@ -227,10 +227,9 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 								</View>
 								<View className='flex-1'>
 									<Text
-										className='font-semibold text-base'
-										style={{
-											color: item.id === 3 && currentUser?.email ? "#EF4444" : undefined,
-										}}>
+										className={`font-semibold text-base ${
+											item.id === 3 && currentUser?.email ? "#EF4444" : "dark:text-white"
+										}`}>
 										{item.title}
 									</Text>
 								</View>

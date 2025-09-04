@@ -132,5 +132,6 @@
 		"help": {
 			"text": "This modal will automatically close when connection is restored"
 		}
-	}
+	},
+	"theme": "Theme"
 }

@@ -123,7 +123,7 @@ const NoteItem = ({ note, index }: Props) => {
 				/>
 			)}
 
-			<Animated.View entering={FadeInDown.delay(100 * index).duration(600)} className='mx-4 mb-4'>
+			<Animated.View entering={FadeInDown.delay(100 * index).duration(600)} className='mx-2 mb-4'>
 				<Pressable
 					onPress={navigateToDetail}
 					className={`relative overflow-hidden rounded-2xl border-2 ${
@@ -139,7 +139,7 @@ const NoteItem = ({ note, index }: Props) => {
 						elevation: 4,
 					}}>
 					{/* Priority Indicator */}
-					<View className={`absolute top-0 left-0 w-1 h-full ${priority.bg}`} />
+					{/* <View className={`absolute top-0 left-0 w-1 h-full ${priority.bg}`} /> */}
 
 					{/* Main Content */}
 					<View className='p-4'>
@@ -165,7 +165,7 @@ const NoteItem = ({ note, index }: Props) => {
 									</Text>
 
 									{/* Note Preview */}
-									{note.text && (
+									{/* {note.text && (
 										<Text
 											className={`text-sm mb-2 ${
 												isComplete ? "text-gray-400 dark:text-gray-500" : "text-gray-600 dark:text-gray-300"
@@ -173,14 +173,14 @@ const NoteItem = ({ note, index }: Props) => {
 											numberOfLines={2}>
 											{note.text}
 										</Text>
-									)}
+									)} */}
 
 									{/* Meta Info */}
 									<View className='flex-row items-center justify-between'>
-										<View className='flex-row items-center'>
+										{/* <View className='flex-row items-center'>
 											<View className={`w-2 h-2 rounded-full ${priority.bg} mr-2`} />
 											<Text className={`text-xs font-medium ${priority.text}`}>{"medium"}</Text>
-										</View>
+										</View> */}
 
 										<View className='flex-row items-center'>
 											<Ionicons name='time-outline' size={12} color={isComplete ? "#9CA3AF" : "#6B7280"} />
@@ -223,7 +223,7 @@ const NoteItem = ({ note, index }: Props) => {
 
 				{/* Reminder Modal */}
 				<Modal animationType='fade' transparent={true} visible={modalVisible} onRequestClose={toggleModal}>
-					<View className='flex-1 justify-center items-center bg-black/50'>
+					<View className='flex-1 justify-center items-center'>
 						<Animated.View
 							entering={FadeIn.duration(300)}
 							className='bg-white dark:bg-gray-800 rounded-3xl mx-6 p-6 min-w-[300px]'

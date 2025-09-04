@@ -1,8 +1,7 @@
 import React from "react";
 import { TouchableOpacity, Text, View, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Animated, { FadeIn, FadeOut, SlideInRight, SlideOutRight } from "react-native-reanimated";
-import { BlurView } from "expo-blur";
+import Animated, { SlideInRight, SlideOutRight } from "react-native-reanimated";
 import { useTranslation } from "react-i18next";
 
 interface NoteOptionsMenuProps {
@@ -14,7 +13,7 @@ interface NoteOptionsMenuProps {
 const NoteOptionsMenu = ({ onSetReminder, onDelete, onClose }: NoteOptionsMenuProps) => {
 	const { t } = useTranslation();
 	return (
-		<Pressable className='absolute z-30 top-0 w-screen h-screen bg-black' onPress={onClose}>
+		<Pressable className='absolute z-30 top-0 w-screen h-screen' onPress={onClose}>
 			<Animated.View
 				entering={SlideInRight.springify().damping(15)}
 				exiting={SlideOutRight.springify().damping(15)}

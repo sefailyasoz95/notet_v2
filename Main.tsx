@@ -8,6 +8,7 @@ import { setOnboardingPassed } from "./src/redux/reducers";
 import AppStack from "./src/stacks/AppStack";
 import AuthStack from "./src/stacks/AuthStack";
 import i18next from "i18next";
+import { useColorScheme } from "nativewind";
 
 const Main = () => {
 	const { onboardingPassed } = useAppSelector((state) => state.global);
@@ -15,10 +16,15 @@ const Main = () => {
 	const [loaded] = useFonts({
 		SpaceMono: require("./assets/fonts/SpaceMono-Regular.ttf"),
 	});
+	const { setColorScheme } = useColorScheme();
+
 	const checkOnboarding = async () => {
 		// await AsyncStorage.removeItem("onBoardingPassed");
 		// await AsyncStorage.removeItem("appLang");
-
+		const theme = await AsyncStorage.getItem("theme");
+		if (theme !== null) {
+			setColorScheme(theme as any);
+		}
 		const isPassed = await AsyncStorage.getItem("onBoardingPassed");
 		const appLang = await AsyncStorage.getItem("appLang");
 		if (isPassed !== null) {

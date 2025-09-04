@@ -229,7 +229,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 				}}
 				data={savedNotes}
 				renderItem={({ item, index }) => (
-					<Animated.View entering={SlideInRight.delay(index * 100).duration(600)} style={{ paddingHorizontal: 20 }}>
+					<Animated.View entering={SlideInRight.delay(index * 100).duration(600)}>
 						<NoteItem note={item} index={index} />
 					</Animated.View>
 				)}
