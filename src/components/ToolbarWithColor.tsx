@@ -6,7 +6,6 @@ import {
 	Toolbar,
 	useEditorBridge,
 	ColorKeyboard,
-	CustomKeyboard,
 	DEFAULT_TOOLBAR_ITEMS,
 	useKeyboard,
 	type EditorBridge,
@@ -50,13 +49,6 @@ export const DarkEditor = ({}: NativeStackScreenProps<any, any, any>) => {
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				style={exampleStyles.keyboardAvoidingView}>
 				<ToolbarWithColor editor={editor} activeKeyboard={activeKeyboard} setActiveKeyboard={setActiveKeyboard} />
-				<CustomKeyboard
-					editor={editor}
-					rootRef={rootRef}
-					keyboards={[ColorKeyboard]}
-					activeKeyboardID={activeKeyboard}
-					setActiveKeyboardID={setActiveKeyboard}
-				/>
 			</KeyboardAvoidingView>
 		</SafeAreaView>
 	);
@@ -70,6 +62,7 @@ interface ToolbarWithColorProps {
 export const ToolbarWithColor = ({ editor }: ToolbarWithColorProps) => {
 	// Get updates of editor state
 	const editorState = useBridgeState(editor);
+	console.log("editorState: ", editorState);
 
 	const { isKeyboardUp: isNativeKeyboardUp } = useKeyboard();
 

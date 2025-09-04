@@ -7,10 +7,10 @@
   resolved "https://registry.yarnpkg.com/@0no-co/graphql.web/-/graphql.web-1.1.2.tgz#9af8deaf3f236c1c6ee99cc5349051475e5dcc83"
   integrity sha512-N2NGsU5FLBhT8NZ+3l2YrzZSHITjNXNuDhC4iDiikv0IujaJ0Xc6xIxQZ/Ek3Cb+rgPjnLHYyJm11tInuJn+cw==
 
-"@10play/tentap-editor@^0.7.4":
-  version "0.7.4"
-  resolved "https://registry.yarnpkg.com/@10play/tentap-editor/-/tentap-editor-0.7.4.tgz#fb05bc27afe86b7284525ba4ecd51acf13d2627f"
-  integrity sha512-aIQxDQ0LvLqNlJqqr1lB/MzBwSC2+dePG3R0A4UdkOJTuqdp6sXKaXI2yUV7rDuRimAau/F+7nmDBb9fPtLIaQ==
+"@10play/tentap-editor@^0.7.5-alpha.0":
+  version "0.7.5-alpha.0"
+  resolved "https://registry.yarnpkg.com/@10play/tentap-editor/-/tentap-editor-0.7.5-alpha.0.tgz#2b4994000b6ac84460a5b2e80e08f4cbe5729e29"
+  integrity sha512-xgO3mnYC5quyJISVPT/FoxKlRR8Np5JMrVGXf7NzM12nKTT3qjKSECzKb9Os0whr/mqwKJFAIMaKZt6GCIHanA==
   dependencies:
     "@tiptap/extension-blockquote" "^2.2.1"
     "@tiptap/extension-bold" "^2.2.1"

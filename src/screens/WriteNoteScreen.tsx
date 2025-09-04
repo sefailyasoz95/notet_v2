@@ -114,7 +114,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						isComplete: false,
 						remind_at: undefined,
 						text: editorContent,
-						title: title,
+						title: title ?? "NotEt note",
 						categoryId: selectedCategoryId!,
 					})
 				);

@@ -46,9 +46,7 @@ function ToastComponent({ message, icon, type }: ToastProps) {
 
 	return (
 		<Animated.View
-			entering={FadeIn.duration(200).withCallback(() => {
-				SlideInUp.duration(200);
-			})}
+			entering={FadeIn.duration(200)}
 			style={[styles.toastShadow]}
 			className='absolute top-12 self-center z-50'>
 			<BlurView
