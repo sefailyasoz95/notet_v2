@@ -5,7 +5,6 @@ import {
 	RichText,
 	Toolbar,
 	useEditorBridge,
-	ColorKeyboard,
 	DEFAULT_TOOLBAR_ITEMS,
 	useKeyboard,
 	type EditorBridge,
@@ -62,7 +61,6 @@ interface ToolbarWithColorProps {
 export const ToolbarWithColor = ({ editor }: ToolbarWithColorProps) => {
 	// Get updates of editor state
 	const editorState = useBridgeState(editor);
-	console.log("editorState: ", editorState);
 
 	const { isKeyboardUp: isNativeKeyboardUp } = useKeyboard();
 

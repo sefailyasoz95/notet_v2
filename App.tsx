@@ -53,7 +53,7 @@ export default function App() {
 	}, []);
 	return (
 		<Provider store={store}>
-			<NoNetworkModal />
+			{/* <NoNetworkModal /> */}
 			<StatusBar />
 			<Main />
 			<Toast config={toastConfig} />

@@ -148,12 +148,12 @@ const NoNetworkModal: React.FC<NoNetworkModalProps> = ({ visible: externalVisibl
 
 						{/* Title */}
 						<Text className='text-black dark:text-white font-bold text-xl text-center mb-2'>
-							{t?.("network.noConnection.title") || "No Internet Connection"}
+							{t("network.noConnection.title") || "No Internet Connection"}
 						</Text>
 
 						{/* Description */}
 						<Text className='text-gray-600 dark:text-gray-400 text-center text-base leading-6'>
-							{t?.("network.noConnection.description") ||
+							{t("network.noConnection.description") ||
 								"Please check your internet connection and try again. Make sure you're connected to a stable network."}
 						</Text>
 					</View>
@@ -162,7 +162,7 @@ const NoNetworkModal: React.FC<NoNetworkModalProps> = ({ visible: externalVisibl
 					<View className='flex-row items-center justify-center mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-2xl'>
 						<View className='w-3 h-3 bg-red-500 rounded-full mr-3' />
 						<Text className='text-gray-700 dark:text-gray-300 text-sm font-medium'>
-							{t?.("network.status.offline") || "Offline"}
+							{t("network.status.offline") || "Offline"}
 						</Text>
 					</View>
 
@@ -176,7 +176,7 @@ const NoNetworkModal: React.FC<NoNetworkModalProps> = ({ visible: externalVisibl
 							<View className='flex-row items-center'>
 								<Ionicons name='refresh-sharp' size={20} color='white' className='mr-2' />
 								<Text className='text-white font-semibold text-base ml-2'>
-									{t?.("network.actions.retry") || "Try Again"}
+									{t("network.actions.retry") || "Try Again"}
 								</Text>
 							</View>
 						</TouchableOpacity>
@@ -192,7 +192,7 @@ const NoNetworkModal: React.FC<NoNetworkModalProps> = ({ visible: externalVisibl
 							<View className='flex-row items-center'>
 								<Ionicons name='settings-sharp' size={20} color='#6B7280' className='mr-2' />
 								<Text className='text-gray-700 dark:text-gray-300 font-semibold text-base ml-2'>
-									{t?.("network.actions.settings") || "Open Settings"}
+									{t("network.actions.settings") || "Open Settings"}
 								</Text>
 							</View>
 						</TouchableOpacity>
@@ -200,7 +200,7 @@ const NoNetworkModal: React.FC<NoNetworkModalProps> = ({ visible: externalVisibl
 
 					{/* Help Text */}
 					<Text className='text-gray-500 dark:text-gray-400 text-xs text-center mt-4'>
-						{t?.("network.help.text") || "This modal will automatically close when connection is restored"}
+						{t("network.help.text") || "This modal will automatically close when connection is restored"}
 					</Text>
 				</Animated.View>
 			</Animated.View>

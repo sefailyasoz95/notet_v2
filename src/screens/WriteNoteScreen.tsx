@@ -35,7 +35,7 @@ type Props = NativeStackScreenProps<AppStackParams, "WriteNoteScreen">;
 const WriteNoteScreen = ({ navigation, route }: Props) => {
 	const [title, setTitle] = useState(route.params?.note?.title ?? "");
 	const [showRichToolbar, setShowRichToolbar] = useState(false);
-	const { currentUser, categories } = useAppSelector((state) => state.global);
+	const { currentUser } = useAppSelector((state) => state.global);
 	const dispatch = useAppDispatch();
 	const insets = useSafeAreaInsets();
 	const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
@@ -183,10 +183,10 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 		<SafeAreaView className='flex-1 bg-gray-50 dark:bg-gray-900' edges={["left", "right"]}>
 			{/* Animated Header */}
 			<Animated.View
-				className='bg-black dark:bg-white rounded-b-3xl px-6 pb-6'
-				style={[styles.headerShadow, headerAnimatedStyle, { paddingTop: insets.top + 20 }]}
+				className='bg-black dark:bg-gray-500 rounded-b-3xl px-6 pb-2'
+				style={[styles.headerShadow, headerAnimatedStyle, { paddingTop: insets.top }]}
 				entering={SlideInUp.duration(600).easing(Easing.out(Easing.cubic))}>
-				<View className='flex-row items-center justify-between mb-6'>
+				<View className='flex-row items-center justify-between mb-3'>
 					<TouchableOpacity
 						onPress={navigation.goBack}
 						className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
@@ -210,7 +210,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 
 				{/* Title Input */}
 				<Animated.View
-					className='bg-white dark:bg-gray-800 rounded-2xl p-4 mb-4'
+					className='bg-white dark:bg-gray-800 rounded-2xl px-2 py-1 mb-4'
 					entering={FadeInLeft.delay(200).duration(600)}>
 					<TextInput
 						className='text-black dark:text-white font-bold text-xl'
@@ -225,7 +225,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 			{/* Rich Text Toolbar */}
 			<Animated.View
 				style={[toolbarAnimatedStyle, { overflow: "hidden" }]}
-				className='bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700'>
+				className='bg-white dark:bg-gray-800 border-b mt-2 w-11/12 self-center border-gray-200 dark:border-gray-700'>
 				<ToolbarWithColor editor={editor} />
 			</Animated.View>
 
@@ -234,8 +234,8 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 				className='flex-1'
 				behavior={Platform.OS === "ios" ? "padding" : "height"}
 				keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}>
-				<Animated.View className='flex-1 m-4' entering={FadeIn.delay(600).duration(600)}>
-					<View className='bg-white dark:bg-gray-800 rounded-2xl flex-1 p-4' style={styles.contentShadow}>
+				<Animated.View className='flex-1 m-2' entering={FadeIn.delay(600).duration(600)}>
+					<View className='bg-white dark:bg-gray-500 rounded-2xl flex-1 px-2' style={styles.contentShadow}>
 						<RichText
 							editor={editor}
 							style={{
