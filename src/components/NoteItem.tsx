@@ -10,7 +10,6 @@ import { Ionicons } from "@expo/vector-icons";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 import * as Notifications from "expo-notifications";
 import moment from "moment";
-import i18next from "i18next";
 import { AppStackParams, NoteType } from "../utils/types";
 import NoteOptionsMenu from "./NoteOptionsMenu";
 
@@ -20,8 +19,6 @@ interface Props {
 }
 
 const NoteItem = ({ note, index }: Props) => {
-	moment.locale(i18next.language);
-
 	const navigation = useNavigation<NavigationProp<AppStackParams>>();
 	const { currentUser } = useAppSelector((state) => state.global);
 	const [isOptionsOpen, setIsOptionsOpen] = useState(false);
@@ -36,7 +33,6 @@ const NoteItem = ({ note, index }: Props) => {
 		if (note.id !== -1) {
 			navigation.navigate("WriteNoteScreen", {
 				note,
-				categoryId: note.categoryId,
 			});
 		}
 	};
@@ -51,7 +47,7 @@ const NoteItem = ({ note, index }: Props) => {
 	};
 
 	useEffect(() => {
-		if (isComplete !== note.isComplete) {
+		if (isComplete !== note?.isComplete) {
 			handleIsComplete();
 		}
 	}, [isComplete]);
@@ -106,8 +102,6 @@ const NoteItem = ({ note, index }: Props) => {
 				return { bg: "bg-gray-500", text: "text-gray-500", dot: "#6B7280" };
 		}
 	};
-
-	const priority = getPriorityColor("medium");
 
 	return (
 		<>
@@ -188,7 +182,7 @@ const NoteItem = ({ note, index }: Props) => {
 												className={`text-xs ml-1 ${
 													isComplete ? "text-gray-400 dark:text-gray-500" : "text-gray-500 dark:text-gray-400"
 												}`}>
-												{moment(note.updated_at || note.created_at).fromNow()}
+												{moment(note?.updated_at || note?.created_at).fromNow()}
 											</Text>
 										</View>
 									</View>
@@ -239,9 +233,7 @@ const NoteItem = ({ note, index }: Props) => {
 									<Ionicons name='alarm' size={24} color='white' />
 								</View>
 								<Text className='text-xl font-bold text-gray-900 dark:text-white mb-2'>{t("setReminder")}</Text>
-								<Text className='text-gray-600 dark:text-gray-300 text-center'>
-									Choose when you want to be reminded
-								</Text>
+								<Text className='text-gray-600 dark:text-gray-300 text-center'>{t("whenToReminded")}</Text>
 							</View>
 
 							<View className='bg-gray-50 dark:bg-gray-700 rounded-xl p-4 mb-6'>

@@ -133,5 +133,6 @@
 			"text": "Dieses Fenster schließt sich automatisch, wenn die Verbindung wiederhergestellt ist"
 		}
 	},
-	"theme": "Thema"
+	"theme": "Thema",
+	"whenToReminded": " Wählen Sie, wann Sie erinnert werden möchten"
 }

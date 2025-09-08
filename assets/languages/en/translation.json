@@ -133,5 +133,6 @@
 			"text": "This modal will automatically close when connection is restored"
 		}
 	},
-	"theme": "Theme"
+	"theme": "Theme",
+	"whenToReminded": "Choose when you want to be reminded"
 }
