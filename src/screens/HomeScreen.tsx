@@ -51,7 +51,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 	const horizontalScrollRef = createRef<ScrollView>();
 	const insets = useSafeAreaInsets();
 	const scrollRef = createRef<FlatList>();
-	const [selectedCategoryId, setSelectedCategoryId] = useState(categories[0]?.id);
 	const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
 	const dispatch = useAppDispatch();
 	const { showToast } = useToast();
@@ -93,17 +92,6 @@ const HomeScreen = ({ navigation, route }: Props) => {
 			}
 		})();
 	}, [savedNotes]);
-
-	useEffect(() => {
-		if (currentUser && !categories.length) {
-			dispatch(
-				createCategory({
-					name: "general",
-					userId: currentUser.id!,
-				})
-			);
-		}
-	}, [currentUser]);
 
 	const updateHeaderState = (collapsed: boolean) => {
 		if (collapsed !== isHeaderCollapsed) {
@@ -223,7 +211,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 					<ActivityIndicator size={50} color={"#3B82F6"} />
 				</Animated.View>
 			)}
-			{typeof currentUser !== undefined && (
+			{currentUser !== undefined && (
 				<>
 					{/* Animated Header */}
 					<Animated.View
@@ -305,9 +293,7 @@ const HomeScreen = ({ navigation, route }: Props) => {
 							className='w-10 h-10 bg-blue-500 rounded-2xl items-center justify-center'
 							style={[styles.fabShadow]}
 							onPress={() => {
-								navigation.navigate("WriteNoteScreen", {
-									categoryId: selectedCategoryId || categories[0].id!,
-								});
+								navigation.navigate("WriteNoteScreen", {});
 							}}
 							activeOpacity={0.8}>
 							<Ionicons name='add-sharp' size={28} color={"white"} />

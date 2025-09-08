@@ -3,7 +3,7 @@ import { supabase } from "../utils/supabase";
 import { CategoryType, NoteType, UserType } from "../utils/types";
 import { decode } from "base64-arraybuffer";
 import DeviceInfo from "react-native-device-info";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import appJson from "../../app.json";
 import * as RNLocalize from "react-native-localize";
 
 export const uploadImageToSupabase = async (
@@ -118,7 +118,10 @@ export const GetCurrentUserService = async (deviceId: string) => {
 		const uniqueID = DeviceInfo.getUniqueIdSync();
 		if (uniqueID !== currentUser.data.deviceId) {
 			const country = RNLocalize.getCountry();
-			updatedUser = await supabase.from("users").update({ deviceId: uniqueID, country }).eq("id", currentUser.data.id);
+			updatedUser = await supabase
+				.from("users")
+				.update({ deviceId: uniqueID, country, used_version: appJson.expo.version })
+				.eq("id", currentUser.data.id);
 		}
 		let savedNotes = await supabase
 			.from("notes")

@@ -38,7 +38,7 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 	const { currentUser } = useAppSelector((state) => state.global);
 	const dispatch = useAppDispatch();
 	const insets = useSafeAreaInsets();
-	const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
+	// const [selectedCategoryId, setSelectedCategoryId] = useState(route.params.categoryId);
 	const { t } = useTranslation();
 	const { isKeyboardUp: isNativeKeyboardUp, keyboardHeight } = useKeyboard();
 
@@ -115,15 +115,10 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						remind_at: undefined,
 						text: editorContent,
 						title: title ?? "NotEt note",
-						categoryId: selectedCategoryId!,
 					})
 				);
 		} else {
-			if (
-				route.params.note.title !== title ||
-				route.params.note.text !== editorContent ||
-				route.params.note.categoryId !== selectedCategoryId
-			) {
+			if (route.params.note.title !== title || route.params.note.text !== editorContent) {
 				dispatch(
 					updateNote({
 						userId: currentUser?.id!,
@@ -131,7 +126,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 						remind_at: route.params.note.remind_at,
 						text: editorContent,
 						title: title.length ? title : t("untitled"),
-						categoryId: selectedCategoryId!,
 						id: route.params.note.id,
 						updated_at: new Date(),
 					})
@@ -154,9 +148,6 @@ const WriteNoteScreen = ({ navigation, route }: Props) => {
 			duration: 300,
 			easing: Easing.out(Easing.cubic),
 		});
-	};
-	const handleCategorySelect = (categoryId: number) => {
-		setSelectedCategoryId(categoryId);
 	};
 
 	// Animation styles

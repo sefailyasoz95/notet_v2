@@ -27,7 +27,6 @@ export type AppStackParams = {
 	ProfileScreen: undefined;
 	WriteNoteScreen: {
 		note?: NoteType;
-		categoryId: number;
 	};
 	DescriptionScreen: {
 		description: string;
@@ -82,7 +81,6 @@ export type NoteType = {
 	text: string;
 	remind_at?: Date;
 	isComplete: boolean;
-	categoryId: number;
 };
 
 export type NotificationContentType = {

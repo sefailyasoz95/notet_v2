@@ -302,7 +302,7 @@ const ProfileScreen = ({ navigation, route }: Props) => {
 								<View className='flex-1'>
 									<Text
 										className={`font-semibold text-base ${
-											item.id === 3 && currentUser?.email ? "#EF4444" : "dark:text-white"
+											item.id === 4 && currentUser?.email ? "text-[#FF2222] dark:text-[#FF6666]" : "dark:text-white"
 										}`}>
 										{item.title}
 									</Text>

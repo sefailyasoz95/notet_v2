@@ -51,12 +51,10 @@ export const getCurrentUser = createAsyncThunk("auth/getCurrentUser", async (dat
 	try {
 		return await GetCurrentUserService(data);
 	} catch (error: any) {
-		const message =
-			(error.response && error.response.data && error.response.data.message) || error.message || error.toString();
 		return {
 			data: undefined,
 			status: 400,
-			message,
+			message: "User not found",
 		};
 	}
 });
