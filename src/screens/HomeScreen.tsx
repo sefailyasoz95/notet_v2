@@ -44,304 +44,317 @@ const HEADER_SCROLL_DISTANCE = HEADER_MAX_HEIGHT - HEADER_MIN_HEIGHT;
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 const HomeScreen = ({ navigation, route }: Props) => {
-	const { t } = useTranslation();
-	const { currentUser, onboardingPassed, savedNotes, loading, categories, success, error, message } = useAppSelector(
-		(state) => state.global
-	);
-	const horizontalScrollRef = createRef<ScrollView>();
-	const insets = useSafeAreaInsets();
-	const scrollRef = createRef<FlatList>();
-	const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
-	const dispatch = useAppDispatch();
-	const { showToast } = useToast();
-	const [ratingModal, setRatingModal] = useState<boolean>(false);
-	const [givenRate, setGivenRate] = useState<number>(4);
-	// Animated values
-	const scrollY = useSharedValue(0);
+	try {
+		const { t } = useTranslation();
+		const { currentUser, onboardingPassed, savedNotes, loading, categories, success, error, message } = useAppSelector(
+			(state) => state.global
+		);
+		const horizontalScrollRef = createRef<ScrollView>();
+		const insets = useSafeAreaInsets();
+		const scrollRef = createRef<FlatList>();
+		const [isHeaderCollapsed, setIsHeaderCollapsed] = useState(false);
+		const dispatch = useAppDispatch();
+		const { showToast } = useToast();
+		const [ratingModal, setRatingModal] = useState<boolean>(false);
+		const [givenRate, setGivenRate] = useState<number>(4);
+		// Animated values
+		const scrollY = useSharedValue(0);
 
-	const toggleModal = () => setRatingModal(!ratingModal);
+		const toggleModal = () => setRatingModal(!ratingModal);
 
-	const fetchUser = async () => {
-		const deviceId = (await AsyncStorage.getItem("deviceId")) ?? DeviceInfo.getUniqueIdSync();
-		dispatch(getCurrentUser(deviceId));
-	};
+		const fetchUser = async () => {
+			const deviceId = (await AsyncStorage.getItem("deviceId")) ?? DeviceInfo.getUniqueIdSync();
+			dispatch(getCurrentUser(deviceId));
+		};
 
-	const handleRating = async (rate: number) => {
-		setGivenRate(rate);
-		dispatch(updateUserInfo({ rating: rate, id: currentUser?.id }));
-		toggleModal();
-		await StoreReview.requestReview();
-	};
-	useEffect(() => {
-		fetchUser();
-	}, [onboardingPassed]);
+		const handleRating = async (rate: number) => {
+			setGivenRate(rate);
+			dispatch(updateUserInfo({ rating: rate, id: currentUser?.id }));
+			toggleModal();
+			await StoreReview.requestReview();
+		};
+		useEffect(() => {
+			fetchUser();
+		}, [onboardingPassed]);
 
-	useEffect(() => {
-		if (success && !loading) {
-			showToast({ message, icon: "checkmark-sharp", type: "success" });
-		}
-		if (error && !loading) {
-			showToast({ message, icon: "close-sharp", type: "error" });
-		}
-	}, [success, loading, error]);
-
-	useEffect(() => {
-		(async () => {
-			if (savedNotes.length > 0 && savedNotes.length % 2 === 0 && !currentUser?.rating) {
-				toggleModal();
+		useEffect(() => {
+			if (success && !loading) {
+				showToast({ message, icon: "checkmark-sharp", type: "success" });
 			}
-		})();
-	}, [savedNotes]);
+			if (error && !loading) {
+				showToast({ message, icon: "close-sharp", type: "error" });
+			}
+		}, [success, loading, error]);
 
-	const updateHeaderState = (collapsed: boolean) => {
-		if (collapsed !== isHeaderCollapsed) {
-			setIsHeaderCollapsed(collapsed);
-		}
-	};
+		useEffect(() => {
+			(async () => {
+				if (savedNotes.length > 0 && savedNotes.length % 2 === 0 && !currentUser?.rating) {
+					toggleModal();
+				}
+			})();
+		}, [savedNotes]);
 
-	const scrollHandler = useAnimatedScrollHandler((event) => {
-		scrollY.value = event.contentOffset.y;
-		const collapsed = event.contentOffset.y > HEADER_SCROLL_DISTANCE / 2;
-		runOnJS(updateHeaderState)(collapsed);
-	});
+		const updateHeaderState = (collapsed: boolean) => {
+			if (collapsed !== isHeaderCollapsed) {
+				setIsHeaderCollapsed(collapsed);
+			}
+		};
 
-	// Header animation styles
-	const headerAnimatedStyle = useAnimatedStyle(() => {
-		const height = interpolate(
-			scrollY.value,
-			[0, HEADER_SCROLL_DISTANCE],
-			[HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
-			"clamp"
+		const scrollHandler = useAnimatedScrollHandler((event) => {
+			scrollY.value = event.contentOffset.y;
+			const collapsed = event.contentOffset.y > HEADER_SCROLL_DISTANCE / 2;
+			runOnJS(updateHeaderState)(collapsed);
+		});
+
+		// Header animation styles
+		const headerAnimatedStyle = useAnimatedStyle(() => {
+			const height = interpolate(
+				scrollY.value,
+				[0, HEADER_SCROLL_DISTANCE],
+				[HEADER_MAX_HEIGHT, HEADER_MIN_HEIGHT],
+				"clamp"
+			);
+
+			return {
+				height,
+			};
+		});
+
+		// Header content animation
+		const headerContentAnimatedStyle = useAnimatedStyle(() => {
+			const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
+
+			const translateY = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [0, -20], "clamp");
+
+			return {
+				opacity,
+				transform: [{ translateY }],
+			};
+		});
+
+		// Mini header animation (shows when collapsed)
+		const miniHeaderAnimatedStyle = useAnimatedStyle(() => {
+			const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
+
+			return {
+				opacity,
+			};
+		});
+
+		// Tab bar animation
+		const tabBarAnimatedStyle = useAnimatedStyle(() => {
+			const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
+
+			return {
+				opacity,
+			};
+		});
+
+		// Mini tab bar animation
+		const miniTabBarAnimatedStyle = useAnimatedStyle(() => {
+			const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
+
+			return {
+				opacity,
+			};
+		});
+
+		// Welcome text animation
+		const welcomeTextAnimatedStyle = useAnimatedStyle(() => {
+			const scale = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [1, 0.8], "clamp");
+
+			return {
+				transform: [{ scale }],
+			};
+		});
+
+		const renderNotesTab = () => (
+			<View style={{ width: SCREEN_WIDTH }}>
+				<Animated.FlatList
+					ref={scrollRef}
+					onScroll={scrollHandler}
+					scrollEventThrottle={16}
+					contentContainerStyle={{
+						paddingTop: HEADER_MAX_HEIGHT,
+						paddingBottom: 120,
+					}}
+					data={savedNotes}
+					renderItem={({ item, index }) => (
+						<Animated.View entering={SlideInRight.delay(index * 100).duration(600)}>
+							<NoteItem note={item} index={index} />
+						</Animated.View>
+					)}
+					ListEmptyComponent={() =>
+						loading ? (
+							<></>
+						) : (
+							<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
+								<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
+									<Ionicons name='document-outline' size={40} color='#9CA3AF' />
+								</View>
+								<Text className='text-black dark:text-white font-semibold text-lg mb-2'>{t("home.noNotesTitle")}</Text>
+								<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>
+									{t("home.noNotesDescription")}
+								</Text>
+							</Animated.View>
+						)
+					}
+					showsVerticalScrollIndicator={false}
+					keyExtractor={(item, index) => item.id?.toString() || index.toString()}
+				/>
+			</View>
 		);
 
-		return {
-			height,
-		};
-	});
-
-	// Header content animation
-	const headerContentAnimatedStyle = useAnimatedStyle(() => {
-		const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
-
-		const translateY = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [0, -20], "clamp");
-
-		return {
-			opacity,
-			transform: [{ translateY }],
-		};
-	});
-
-	// Mini header animation (shows when collapsed)
-	const miniHeaderAnimatedStyle = useAnimatedStyle(() => {
-		const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
-
-		return {
-			opacity,
-		};
-	});
-
-	// Tab bar animation
-	const tabBarAnimatedStyle = useAnimatedStyle(() => {
-		const opacity = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE / 2], [1, 0], "clamp");
-
-		return {
-			opacity,
-		};
-	});
-
-	// Mini tab bar animation
-	const miniTabBarAnimatedStyle = useAnimatedStyle(() => {
-		const opacity = interpolate(scrollY.value, [HEADER_SCROLL_DISTANCE / 2, HEADER_SCROLL_DISTANCE], [0, 1], "clamp");
-
-		return {
-			opacity,
-		};
-	});
-
-	// Welcome text animation
-	const welcomeTextAnimatedStyle = useAnimatedStyle(() => {
-		const scale = interpolate(scrollY.value, [0, HEADER_SCROLL_DISTANCE], [1, 0.8], "clamp");
-
-		return {
-			transform: [{ scale }],
-		};
-	});
-
-	const renderNotesTab = () => (
-		<View style={{ width: SCREEN_WIDTH }}>
-			<Animated.FlatList
-				ref={scrollRef}
-				onScroll={scrollHandler}
-				scrollEventThrottle={16}
-				contentContainerStyle={{
-					paddingTop: HEADER_MAX_HEIGHT,
-					paddingBottom: 120,
-				}}
-				data={savedNotes}
-				renderItem={({ item, index }) => (
-					<Animated.View entering={SlideInRight.delay(index * 100).duration(600)}>
-						<NoteItem note={item} index={index} />
+		return (
+			<SafeAreaView className='flex-1 bg-white dark:bg-gray-900' edges={["left", "right"]}>
+				{loading && (
+					<Animated.View
+						entering={FadeIn}
+						className={"absolute w-full h-full z-30 flex-1 items-center justify-center bg-black/50 dark:bg-white/20"}>
+						<ActivityIndicator size={50} color={"#3B82F6"} />
 					</Animated.View>
 				)}
-				ListEmptyComponent={() =>
-					loading ? (
-						<></>
-					) : (
-						<Animated.View className='items-center justify-center' entering={FadeIn.delay(600).duration(600)}>
-							<View className='w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-3xl items-center justify-center mb-6'>
-								<Ionicons name='document-outline' size={40} color='#9CA3AF' />
-							</View>
-							<Text className='text-black dark:text-white font-semibold text-lg mb-2'>{t("home.noNotesTitle")}</Text>
-							<Text className='text-gray-600 dark:text-gray-400 text-center px-8'>{t("home.noNotesDescription")}</Text>
-						</Animated.View>
-					)
-				}
-				showsVerticalScrollIndicator={false}
-				keyExtractor={(item, index) => item.id?.toString() || index.toString()}
-			/>
-		</View>
-	);
+				{currentUser !== undefined && (
+					<>
+						{/* Animated Header */}
+						<Animated.View
+							className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end'
+							style={[styles.headerShadow, headerAnimatedStyle]}>
+							{/* Main Header Content */}
+							<Animated.View style={[headerContentAnimatedStyle]} className='pb-2'>
+								<View className='flex-row items-center justify-between mb-4 px-6'>
+									<Animated.View style={[welcomeTextAnimatedStyle]} className='flex-row items-center space-x-3'>
+										<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
+											<Image
+												className='w-8 h-8 rounded-lg'
+												source={require("../../assets/favicon.png")}
+												contentFit='cover'
+												transition={100}
+											/>
+										</View>
+										<View>
+											<Text className='text-white dark:text-black font-bold text-xl'>{t("home.welcome")}</Text>
+											<Text className='text-white/70 dark:text-black/70 text-sm'>
+												{currentUser && currentUser?.fullName
+													? currentUser?.fullName.split(" ")[0]
+													: `Guest${currentUser?.deviceId.split("-")[0]}`}
+											</Text>
+										</View>
+									</Animated.View>
+									<TouchableOpacity
+										onPress={() => navigation.navigate("ProfileScreen")}
+										className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+										<Ionicons name='person-sharp' size={20} color={"white"} />
+									</TouchableOpacity>
+								</View>
+							</Animated.View>
 
-	return (
-		<SafeAreaView className='flex-1 bg-white dark:bg-gray-900' edges={["left", "right"]}>
-			{loading && (
-				<Animated.View
-					entering={FadeIn}
-					className={"absolute w-full h-full z-30 flex-1 items-center justify-center bg-black/50 dark:bg-white/20"}>
-					<ActivityIndicator size={50} color={"#3B82F6"} />
-				</Animated.View>
-			)}
-			{currentUser !== undefined && (
-				<>
-					{/* Animated Header */}
-					<Animated.View
-						className='bg-black dark:bg-white absolute top-0 z-20 rounded-b-3xl w-full justify-end'
-						style={[styles.headerShadow, headerAnimatedStyle]}>
-						{/* Main Header Content */}
-						<Animated.View style={[headerContentAnimatedStyle]} className='pb-2'>
-							<View className='flex-row items-center justify-between mb-4 px-6'>
-								<Animated.View style={[welcomeTextAnimatedStyle]} className='flex-row items-center space-x-3'>
-									<View className='w-12 h-12 bg-blue-500 rounded-xl items-center justify-center'>
-										<Image
-											className='w-8 h-8 rounded-lg'
-											source={require("../../assets/favicon.png")}
-											contentFit='cover'
-											transition={100}
-										/>
-									</View>
-									<View>
-										<Text className='text-white dark:text-black font-bold text-xl'>{t("home.welcome")}</Text>
-										<Text className='text-white/70 dark:text-black/70 text-sm'>
-											{currentUser && currentUser?.fullName
-												? currentUser?.fullName.split(" ")[0]
-												: `Guest${currentUser?.deviceId.split("-")[0]}`}
+							{/* Mini Header */}
+							{/* Mini Header */}
+							<Animated.View style={[miniHeaderAnimatedStyle]} className='absolute bottom-2 left-0 right-0'>
+								<View className='flex-row items-center justify-between px-6'>
+									<View className='flex-row items-center space-x-3'>
+										<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
+											<Image
+												className='w-6 h-6 rounded-md'
+												source={require("../../assets/favicon.png")}
+												contentFit='cover'
+												transition={100}
+											/>
+										</View>
+										<Text className='text-white dark:text-black font-bold text-lg'>
+											{savedNotes.length} {t("home.notes")}
 										</Text>
 									</View>
-								</Animated.View>
-								<TouchableOpacity
-									onPress={() => navigation.navigate("ProfileScreen")}
-									className='w-10 h-10 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
-									<Ionicons name='person-sharp' size={20} color={"white"} />
-								</TouchableOpacity>
-							</View>
-						</Animated.View>
-
-						{/* Mini Header */}
-						{/* Mini Header */}
-						<Animated.View style={[miniHeaderAnimatedStyle]} className='absolute bottom-2 left-0 right-0'>
-							<View className='flex-row items-center justify-between px-6'>
-								<View className='flex-row items-center space-x-3'>
-									<View className='w-8 h-8 bg-blue-500 rounded-lg items-center justify-center'>
-										<Image
-											className='w-6 h-6 rounded-md'
-											source={require("../../assets/favicon.png")}
-											contentFit='cover'
-											transition={100}
-										/>
-									</View>
-									<Text className='text-white dark:text-black font-bold text-lg'>
-										{savedNotes.length} {t("home.notes")}
-									</Text>
+									<TouchableOpacity
+										onPress={() => navigation.navigate("ProfileScreen")}
+										className='w-8 h-8 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
+										<Ionicons name='person-sharp' size={16} color={"white"} />
+									</TouchableOpacity>
 								</View>
-								<TouchableOpacity
-									onPress={() => navigation.navigate("ProfileScreen")}
-									className='w-8 h-8 bg-white/10 dark:bg-black/10 rounded-full items-center justify-center'>
-									<Ionicons name='person-sharp' size={16} color={"white"} />
-								</TouchableOpacity>
-							</View>
+							</Animated.View>
 						</Animated.View>
-					</Animated.View>
 
-					{/* Horizontal Scrollable Content */}
-					<Animated.View className='flex-1 mt-5' entering={FadeIn.delay(400).duration(600)}>
-						<ScrollView
-							ref={horizontalScrollRef}
-							horizontal
-							pagingEnabled
-							showsHorizontalScrollIndicator={false}
-							scrollEnabled={false}
-							contentContainerStyle={{ flexGrow: 1 }}>
-							{renderNotesTab()}
-						</ScrollView>
-					</Animated.View>
+						{/* Horizontal Scrollable Content */}
+						<Animated.View className='flex-1 mt-5' entering={FadeIn.delay(400).duration(600)}>
+							<ScrollView
+								ref={horizontalScrollRef}
+								horizontal
+								pagingEnabled
+								showsHorizontalScrollIndicator={false}
+								scrollEnabled={false}
+								contentContainerStyle={{ flexGrow: 1 }}>
+								{renderNotesTab()}
+							</ScrollView>
+						</Animated.View>
 
-					{/* Floating Action Button */}
-					<Animated.View
-						className={"absolute right-6 bottom-8"}
-						entering={SlideInRight.delay(800).duration(600).easing(Easing.out(Easing.cubic))}>
-						<TouchableOpacity
-							className='w-10 h-10 bg-blue-500 rounded-2xl items-center justify-center'
-							style={[styles.fabShadow]}
-							onPress={() => {
-								navigation.navigate("WriteNoteScreen", {});
-							}}
-							activeOpacity={0.8}>
-							<Ionicons name='add-sharp' size={28} color={"white"} />
-						</TouchableOpacity>
-					</Animated.View>
-				</>
-			)}
+						{/* Floating Action Button */}
+						<Animated.View
+							className={"absolute right-6 bottom-8"}
+							entering={SlideInRight.delay(800).duration(600).easing(Easing.out(Easing.cubic))}>
+							<TouchableOpacity
+								className='w-10 h-10 bg-blue-500 rounded-2xl items-center justify-center'
+								style={[styles.fabShadow]}
+								onPress={() => {
+									navigation.navigate("WriteNoteScreen", {});
+								}}
+								activeOpacity={0.8}>
+								<Ionicons name='add-sharp' size={28} color={"white"} />
+							</TouchableOpacity>
+						</Animated.View>
+					</>
+				)}
 
-			{/* Rating Modal */}
-			<Modal animationType='fade' transparent={true} visible={ratingModal} onRequestClose={toggleModal}>
-				<View style={styles.centeredView}>
-					<Animated.View
-						className='bg-white dark:bg-gray-800 rounded-3xl mx-6 p-6 border border-gray-200 dark:border-gray-700'
-						style={[styles.modalShadow]}
-						entering={SlideInDown.duration(400).easing(Easing.out(Easing.cubic))}>
-						<View className='items-center mb-6'>
-							<View className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center mb-4'>
-								<Ionicons name='star' size={28} color='white' />
+				{/* Rating Modal */}
+				<Modal animationType='fade' transparent={true} visible={ratingModal} onRequestClose={toggleModal}>
+					<View style={styles.centeredView}>
+						<Animated.View
+							className='bg-white dark:bg-gray-800 rounded-3xl mx-6 p-6 border border-gray-200 dark:border-gray-700'
+							style={[styles.modalShadow]}
+							entering={SlideInDown.duration(400).easing(Easing.out(Easing.cubic))}>
+							<View className='items-center mb-6'>
+								<View className='w-16 h-16 bg-blue-500 rounded-2xl items-center justify-center mb-4'>
+									<Ionicons name='star' size={28} color='white' />
+								</View>
+								<Text className='text-black dark:text-white font-bold text-xl text-center mb-2'>
+									{t("home.rating.title")}
+								</Text>
+								<Text className='text-gray-600 dark:text-gray-400 text-center'>{t("home.rating.description")}</Text>
 							</View>
-							<Text className='text-black dark:text-white font-bold text-xl text-center mb-2'>
-								{t("home.rating.title")}
-							</Text>
-							<Text className='text-gray-600 dark:text-gray-400 text-center'>{t("home.rating.description")}</Text>
-						</View>
 
-						<View className='flex-row items-center justify-center space-x-2 mb-6'>
-							{[1, 2, 3, 4, 5].map((rate, index) => (
-								<TouchableOpacity onPress={() => handleRating(rate)} key={index} className='p-2'>
-									<Ionicons
-										name={rate <= givenRate ? "star" : "star-outline"}
-										size={32}
-										color={rate <= givenRate ? "#3B82F6" : "#9CA3AF"}
-									/>
-								</TouchableOpacity>
-							))}
-						</View>
+							<View className='flex-row items-center justify-center space-x-2 mb-6'>
+								{[1, 2, 3, 4, 5].map((rate, index) => (
+									<TouchableOpacity onPress={() => handleRating(rate)} key={index} className='p-2'>
+										<Ionicons
+											name={rate <= givenRate ? "star" : "star-outline"}
+											size={32}
+											color={rate <= givenRate ? "#3B82F6" : "#9CA3AF"}
+										/>
+									</TouchableOpacity>
+								))}
+							</View>
 
-						<TouchableOpacity
-							className='w-full bg-gray-100 dark:bg-gray-700 rounded-2xl p-2 items-center'
-							onPress={toggleModal}
-							activeOpacity={0.8}>
-							<Text className='text-black dark:text-white font-semibold'>{t("home.rating.notNow")}</Text>
-						</TouchableOpacity>
-					</Animated.View>
+							<TouchableOpacity
+								className='w-full bg-gray-100 dark:bg-gray-700 rounded-2xl p-2 items-center'
+								onPress={toggleModal}
+								activeOpacity={0.8}>
+								<Text className='text-black dark:text-white font-semibold'>{t("home.rating.notNow")}</Text>
+							</TouchableOpacity>
+						</Animated.View>
+					</View>
+				</Modal>
+			</SafeAreaView>
+		);
+	} catch (error) {
+		return (
+			<SafeAreaView className='flex-1 bg-white dark:bg-gray-900' edges={["left", "right"]}>
+				<View className='flex-1 items-center justify-center px-6'>
+					<Text className='text-black dark:text-white font-bold text-xl text-center mb-2'>Something went wrong!</Text>
+					<Text className='text-gray-600 dark:text-gray-400 text-center'>{JSON.stringify(error)}.</Text>
 				</View>
-			</Modal>
-		</SafeAreaView>
-	);
+			</SafeAreaView>
+		);
+	}
 };
 
 export default HomeScreen;
